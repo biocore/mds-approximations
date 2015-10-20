@@ -1,0 +1,22 @@
+# Check on http://lint.travis-ci.org/ after modifying it!  Originally
+# modified from https://gist.github.com/dan-blanchard/7045057
+sudo: false
+language: python
+env:
+  - PYTHON_VERSION=3.5
+  - PYTHON_VERSION=3.4
+  - PYTHON_VERSION=3.3
+before_install:
+  - wget http://repo.continuum.io/miniconda/Miniconda3-3.7.3-Linux-x86_64.sh -O miniconda.sh
+  - chmod +x miniconda.sh
+  - ./miniconda.sh -b
+  - export PATH=/home/travis/miniconda3/bin:$PATH
+  # Update conda itself
+  - conda update --yes conda
+install:
+  - conda create --yes -n testaroo python=$PYTHON_VERSION numpy scipy matplotlib pandas sklearn ipython cython
+  - if [ ${USE_CYTHON} ]; then conda install --yes -n testaroo cython; fi
+  - source activate testaroo
+  - pip install . --no-deps
+script:
+  - nose
