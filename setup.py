@@ -54,16 +54,12 @@ setup(name='mdsa',
       packages=find_packages(),
       setup_requires=['numpy >= 1.9.2'],
       install_requires=[
-          'decorator >= 3.4.2',
-          'future >= 0.14.3',
-          'IPython >= 3.2.0',
+          'IPython',
           'matplotlib >= 1.4.3',
           'numpy >= 1.9.2',
           'pandas >= 0.16.2',
           'scipy >= 0.15.1',
-          'six >= 1.9.0',
           'sklearn'
       ],
-      extras_require={'test': ["nose", "pep8", "flake8"],
-                      'doc': ["Sphinx == 1.2.2", "sphinx-bootstrap-theme"]},
+      extras_require={'test': ["nose", "pep8", "flake8"]},
       classifiers=classifiers)
