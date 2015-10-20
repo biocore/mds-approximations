@@ -10,6 +10,7 @@ from __future__ import absolute_import, division, print_function
 from unittest import TestCase, main
 from mdsa.lib import return_forty_two
 
+
 class LibraryTests(TestCase):
     def test_return_forty_two(self):
         self.assertEqual(return_forty_two(), 42)

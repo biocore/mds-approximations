@@ -7,6 +7,7 @@
 # ----------------------------------------------------------------------------
 from __future__ import absolute_import, division, print_function
 
+
 def return_forty_two(strict=True):
     """Function that returns the integer 42
 
