@@ -48,21 +48,21 @@ class Stress(object):
         # arrays/matrices can potentially be quite big
         #
         assert isinstance(orig_distmat, numpy.ndarray), \
-               "orig_distmat is not a numpy.ndarray instance"
+            "orig_distmat is not a numpy.ndarray instance"
         assert isinstance(mds_coords, numpy.ndarray), \
-               "mds_coords is not a numpy.ndarray instance"
+            "mds_coords is not a numpy.ndarray instance"
 
         # check array/matrix shapes and sizes
         assert len(orig_distmat.shape) == 2, \
-               "orig_distmat is not a 2D array/matrix."
+            "orig_distmat is not a 2D array/matrix."
         assert len(mds_coords.shape) == 2, \
-               "mds_coords is not a 2D array."
+            "mds_coords is not a 2D array."
         assert orig_distmat.shape[0] == mds_coords.shape[0], \
-               "orig_distmat and mds_coords do not have the same" \
-               " number of rows/objects."
+            "orig_distmat and mds_coords do not have the same" \
+            " number of rows/objects."
         assert orig_distmat.shape[1] > mds_coords.shape[1], \
-               "orig_distmat shape bigger than mds_coords shape." \
-               " Possible argument mixup"
+            "orig_distmat shape bigger than mds_coords shape." \
+            " Possible argument mixup"
 
         self._orig_distmat = orig_distmat
 
@@ -77,8 +77,6 @@ class Stress(object):
             if scale != 1.0:
                 self._reproduced_distmat = self._reproduced_distmat / scale
 
-
-
     def calcKruskalStress(self):
         """Calculate Kruskal's Stress AKA Stress-1
 
@@ -86,8 +84,8 @@ class Stress(object):
         sqrt( SUM_ij (d'(i,j) - d(i,j))^2 / SUM_ij d(i,j)^2 for i<j
 
         where d(i,j) is the distance between i and j in the original distance
-        matrix (here: self._orig_distmat), and d'(i,j) the distance implied by an
-        mds mapping (here: self._reproduced_distmat)
+        matrix (here: self._orig_distmat), and d'(i,j) the distance implied
+        by an mds mapping (here: self._reproduced_distmat)
 
         According to Johnson & Wichern (2002): 'Applied Multivariate
         Statistical Analysis'' p701 (citing Kruskal (1964)) the
@@ -124,8 +122,6 @@ class Stress(object):
         result = numpy.sqrt(numerator / denominator)
 
         return result
-
-
 
     def calcSstress(self):
         """Calculate SStress
@@ -167,8 +163,6 @@ class Stress(object):
 
         return result
 
-
-
     @staticmethod
     def _calc_rowdist(row1, row2):
         """Calculate the euclidean distance between two row vectors.
@@ -191,8 +185,6 @@ class Stress(object):
         result = numpy.sqrt(row_diffsq.sum())
         return result
 
-
-
     def _calc_pwdist(self, mds_coords):
         """Compute a full symmetric distance matrix from MDS coordinates
 
@@ -211,12 +203,12 @@ class Stress(object):
         """
 
         assert isinstance(mds_coords, numpy.ndarray), \
-               "mds_coords is not a numpy ndarray"
+            "mds_coords is not a numpy ndarray"
 
         result = numpy.zeros((mds_coords.shape[0], mds_coords.shape[0]))
         for i in range(mds_coords.shape[0]):
             row_i = mds_coords[i, :]
-            for j in range(i+1, mds_coords.shape[0]):
+            for j in range(i + 1, mds_coords.shape[0]):
                 result[i, j] = self._calc_rowdist(row_i, mds_coords[j, :])
                 result[j, i] = result[i, j]
         return result

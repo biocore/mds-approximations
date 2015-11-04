@@ -101,26 +101,27 @@ PRINT_TIMINGS = False
 def principal_coordinates_analysis(distance_matrix, algorithm, dimensions):
     """Takes a distance matrix and returns principal coordinate results
 
-    point_matrix: each row is an axis and the columns are points within the axis
+    point_matrix: each row is an axis and the columns are points within the
+                  axis
     eigvals: correspond to the rows and indicate the amount of the variation
         that that the axis in that row accounts for
     NOT NECESSARILY SORTED
     """
-    if algorithm=='nystrom':
-        n_seeds = int(log(distance_matrix.shape[0],2))**2
-        if n_seeds<=dimensions:
-            n_seeds=dimensions+1
-        elif n_seeds>=distance_matrix.shape[0]:
-            n_seeds=distance_matrix.shape[0]-1
+    if algorithm == 'nystrom':
+        n_seeds = int(log(distance_matrix.shape[0], 2))**2
+        if n_seeds <= dimensions:
+            n_seeds = dimensions + 1
+        elif n_seeds >= distance_matrix.shape[0]:
+            n_seeds = distance_matrix.shape[0] - 1
 
-        sample_distmtx = array(sample(distance_matrix,n_seeds))
+        sample_distmtx = array(sample(distance_matrix, n_seeds))
 
         coords = nystrom(sample_distmtx, dimensions)
 
-        eigvals = ['NaN']*dimensions
-        pcnts = ['NaN']*dimensions
+        eigvals = ['NaN'] * dimensions
+        pcnts = ['NaN'] * dimensions
 
-    elif algorithm=='scmds':
+    elif algorithm == 'scmds':
         num_objects = distance_matrix.shape[0]
         tile_size = int(num_objects * 0.6)
         tile_overlap = int(tile_size * 0.09)
@@ -134,11 +135,12 @@ def principal_coordinates_analysis(distance_matrix, algorithm, dimensions):
         tile_no = 1
         tile_start = 0
         tile_end = tile_size
-        curr_tile_size = tile_end-tile_start
+        curr_tile_size = tile_end - tile_start
 
-        while curr_tile_size>0:
-            (tile_eigvecs, tile_eigvals) = cmds_tzeng(\
-                distance_matrix[tile_start:tile_end, tile_start:tile_end], dimensions)
+        while curr_tile_size > 0:
+            (tile_eigvecs, tile_eigvals) = cmds_tzeng(
+                distance_matrix[tile_start:tile_end, tile_start:tile_end],
+                dimensions)
 
             comb_mds.add(tile_eigvecs, tile_overlap)
 
@@ -146,19 +148,19 @@ def principal_coordinates_analysis(distance_matrix, algorithm, dimensions):
                 break
             else:
                 tile_start = tile_start + tile_size - tile_overlap
-                if tile_end+tile_size >= num_objects:
+                if tile_end + tile_size >= num_objects:
                     tile_end = num_objects
                 else:
                     tile_end = tile_end + tile_size - tile_overlap
 
-
             tile_no += 1
-            if tile_no>10: break
-            curr_tile_size = tile_end-tile_start
+            if tile_no > 10:
+                break
+            curr_tile_size = tile_end - tile_start
 
         coords = array(comb_mds.getFinalMDS())
-        eigvals = ['NaN']*dimensions
-        pcnts = ['NaN']*dimensions
+        eigvals = ['NaN'] * dimensions
+        pcnts = ['NaN'] * dimensions
     else:
         raise ValueError("Method (%s) not implemented", algorithm)
 
@@ -169,21 +171,20 @@ def rowmeans(mat):
     """Returns a `column-vector` of row-means of the 2d input array/matrix
     """
 
-    if not len(mat.shape)==2:
+    if not len(mat.shape) == 2:
         raise ValueError("argument is not a 2D ndarray")
 
-    #nrows = mat.shape[0]
-    ## create a column vector (hack!)
-    #cv = matrix(arange(float(nrows)))
-    #cv = cv.T
-    #for i in range(nrows):
-    #    cv[i] = mat[i].mean()
+    # nrows = mat.shape[0]
+    #  create a column vector (hack!)
+    # cv = matrix(arange(float(nrows)))
+    # cv = cv.T
+    #  for i in range(nrows):
+    #     cv[i] = mat[i].mean()
     #
     # As pointed out by Daniel the above is much simpler done in Numpy:
     cv = matrix(mean(mat, axis=1).reshape((mat.shape[0], 1)))
 
     return cv
-
 
 
 def affine_mapping(matrix_x, matrix_y):
@@ -262,9 +263,6 @@ def affine_mapping(matrix_x, matrix_y):
     # iterate over the results. Couldn't figure out how to do this
     # properly :(
 
-    #idx = argwhere(sign(rx.diagonal()) != sign(ry.diagonal()))
-    #for i in idx:
-    #	qy[:,i] *= -1
     for i in range(qx.shape[1]):
         if sign(rx[i, i]) != sign(ry[i, i]):
             qy[:, i] *= -1
@@ -274,7 +272,6 @@ def affine_mapping(matrix_x, matrix_y):
     ret_b = oy - ret_u * ox
 
     return (ret_u, ret_b)
-
 
 
 def adjust_mds_to_ref(mds_ref, mds_add, n_overlap):
@@ -309,10 +306,11 @@ def adjust_mds_to_ref(mds_ref, mds_add, n_overlap):
     # paranoia: unitary_op is of type matrix, make sure mds_add
     # is as well so that we can use '*' for matrix multiplication
     mds_add_adj = unitary_op * matrix(mds_add.transpose()) + \
-                         kron(shift_op, ones((1, mds_add.shape[0])))
+        kron(shift_op, ones((1, mds_add.shape[0])))
     mds_add_adj = mds_add_adj.transpose()
 
     return mds_add_adj
+
 
 def recenter(joined_mds):
     """Recenter an Mds mapping that has been created by joining, i.e.
@@ -323,11 +321,11 @@ def recenter(joined_mds):
     sure what is happening here
 
     Matlab prototype from Tzeng et al. 2008:
-	 X = zero_sum(X); # subtract column means
-	 M = X'*X;
-	 [basis,L] = eig(M);
-	 Y = X*basis;
-	 return Y = Y(:,end:-1:1);
+         X = zero_sum(X); # subtract column means
+         M = X'*X;
+         [basis,L] = eig(M);
+         Y = X*basis;
+         return Y = Y(:,end:-1:1);
 
     Arguments:
     - `mds_combined`:
@@ -343,10 +341,10 @@ def recenter(joined_mds):
     # As pointed out by Daniel: the following two loop can be done in
     # one if you pass down the axis variable to means()
     #
-    #colmean = []
-    #for i in range(joined_mds.shape[1]):
+    # colmean = []
+    # for i in range(joined_mds.shape[1]):
     #    colmean.append(joined_mds[:, i].mean())
-    #for i in range(joined_mds.shape[0]):
+    # for i in range(joined_mds.shape[0]):
     #    joined_mds[i, :] = joined_mds[i, :] - colmean
     #
     joined_mds = joined_mds - joined_mds.mean(axis=0)
@@ -369,6 +367,7 @@ def recenter(joined_mds):
     # good
 
     return joined_mds
+
 
 def combine_mds(mds_ref, mds_add, n_overlap):
     """Returns a combination of the two MDS mappings mds_ref and
@@ -402,13 +401,13 @@ def combine_mds(mds_ref, mds_add, n_overlap):
 
     mds_add_adj = adjust_mds_to_ref(mds_ref, mds_add, n_overlap)
 
-    combined_mds = concatenate(( \
-        mds_ref[0:mds_ref.shape[0]-n_overlap, :], mds_add_adj))
+    combined_mds = concatenate((
+        mds_ref[0:mds_ref.shape[0] - n_overlap, :], mds_add_adj))
 
     return combined_mds
 
 
-def cmds_tzeng(distmat, dim = None):
+def cmds_tzeng(distmat, dim=None):
     """Calculate classical multidimensional scaling on a distance matrix.
 
     Faster than default implementation of dim is smaller than
@@ -436,9 +435,9 @@ def cmds_tzeng(distmat, dim = None):
     # and convert explicitely (it's local only):
     distmat = matrix(distmat)
 
-    h = eye(n) - ones((n, n))/n
+    h = eye(n) - ones((n, n)) / n
     assocmat = -h * (power(distmat, 2)) * h / 2
-    #print "DEBUG assocmat[:3] = %s" % assocmat[:3]
+    # print "DEBUG assocmat[:3] = %s" % assocmat[:3]
 
     (eigvals, eigvecs) = eigh(assocmat)
 
@@ -457,8 +456,6 @@ def cmds_tzeng(distmat, dim = None):
     return (eigvecs.transpose(), eigvals)
 
 
-
-
 class CombineMds(object):
     """
     Convinience class for joining MDS mappings. Several mappings can
@@ -468,7 +465,6 @@ class CombineMds(object):
     See Tzeng  et al. 2008, PMID: 18394154
     """
 
-
     def __init__(self, mds_ref=None):
         """
         Init with reference MDS
@@ -477,12 +473,11 @@ class CombineMds(object):
         self._mds = mds_ref
         self._need_centering = False
 
-
     def add(self, mds_add, overlap_size):
         """Add a new MDS mapping to existing one
         """
 
-        if self._mds == None:
+        if self._mds is None:
             self._mds = mds_add
             return
 
@@ -493,7 +488,6 @@ class CombineMds(object):
 
         self._need_centering = True
         self._mds = combine_mds(self._mds, mds_add, overlap_size)
-
 
     def getFinalMDS(self):
         """Get final, combined MDS solution
@@ -525,7 +519,8 @@ def calc_matrix_b(matrix_e, matrix_f):
     if matrix_e.shape[0] != matrix_e.shape[1]:
         raise ValueError("matrix_e should be quadratic")
     if matrix_f.shape[0] != matrix_e.shape[0]:
-        raise ValueError("matrix_e and matrix_f should have same number of rows")
+        raise ValueError(
+            "matrix_e and matrix_f should have same number of rows")
 
     nseeds = matrix_e.shape[0]
 
@@ -534,7 +529,7 @@ def calc_matrix_b(matrix_e, matrix_f):
     #
     row_center_e = zeros(nseeds)
     for i in range(nseeds):
-        row_center_e[i] = power(matrix_e[i, :], 2).sum()/nseeds
+        row_center_e[i] = power(matrix_e[i, :], 2).sum() / nseeds
 
     # The following is not needed in LMDS but part of original Nystrom
     #
@@ -546,9 +541,8 @@ def calc_matrix_b(matrix_e, matrix_f):
     # subtract col_center_f[j] below from result[i, j] and you have
     # nystrom. dont subtract it and you have lmds
 
-
-    #result = zeros((nrows, ncols))
-    #for i in xrange(nrows):
+    # result = zeros((nrows, ncols))
+    # for i in xrange(nrows):
     #    for j in xrange(ncols):
     #
     #        # - original one line version:
@@ -568,10 +562,9 @@ def calc_matrix_b(matrix_e, matrix_f):
     #   by daniel. 20xfaster on a 750x3000 seed-matrix. cloning idea
     #   copied from
     #   http://stackoverflow.com/questions/1550130/cloning-row-or-column-vectors
-    result = -0.5 * (matrix_f**2 - array([row_center_e, ]*ncols).transpose())
+    result = -0.5 * (matrix_f**2 - array([row_center_e, ] * ncols).transpose())
 
     return result
-
 
 
 def calc_matrix_a(matrix_e):
@@ -601,7 +594,7 @@ def calc_matrix_a(matrix_e):
 
     row_center = zeros(nseeds)
     for i in range(nseeds):
-        row_center[i] = power(matrix_e[i, :], 2).sum()/nseeds
+        row_center[i] = power(matrix_e[i, :], 2).sum() / nseeds
 
     # E should be symmetric, i.e. column and row means are identical.
     # Why is that not mentioned in the papers? To be on the safe side
@@ -612,7 +605,7 @@ def calc_matrix_a(matrix_e):
     # or simply:
     col_center = row_center
 
-    grand_center = power(matrix_e, 2).sum()/power(nseeds, 2)
+    grand_center = power(matrix_e, 2).sum() / power(nseeds, 2)
 
     # E is symmetric and so is A, which is why we don't need to loop
     # over the whole thing
@@ -633,7 +626,6 @@ def calc_matrix_a(matrix_e):
                 result[j, i] = result[i, j]
 
     return result
-
 
 
 def build_seed_matrix(fullmat_dim, seedmat_dim, getdist, permute_order=True):
@@ -665,16 +657,16 @@ def build_seed_matrix(fullmat_dim, seedmat_dim, getdist, permute_order=True):
         picked_seeds = sample(range(fullmat_dim), seedmat_dim)
     else:
         picked_seeds = range(seedmat_dim)
-    #assert len(picked_seeds) == seedmat_dim, (
+    # assert len(picked_seeds) == seedmat_dim, (
     #    "mismatch between number of picked seeds and seedmat dim.")
 
     # Putting picked seeds/indices at the front is not enough,
     # need to change/correct all indices to maintain consistency
     #
     used_index_order = range(fullmat_dim)
-    picked_seeds.sort() # otherwise the below fails
+    picked_seeds.sort()  # otherwise the below fails
     for i, seed_idx in enumerate(picked_seeds):
-        used_index_order.pop(seed_idx-i)
+        used_index_order.pop(seed_idx - i)
     used_index_order = picked_seeds + used_index_order
 
     # Order is now determined in used_index_order
@@ -693,7 +685,6 @@ def build_seed_matrix(fullmat_dim, seedmat_dim, getdist, permute_order=True):
             else:
                 seedmat[i, j] = seedmat[j, i]
 
-
     restore_idxs = argsort(used_index_order)
     if PRINT_TIMINGS:
         print("TIMING(%s): Seedmat calculation took %f CPU secs" %
@@ -704,14 +695,12 @@ def build_seed_matrix(fullmat_dim, seedmat_dim, getdist, permute_order=True):
     return (seedmat, restore_idxs)
 
 
-
 def nystrom(seed_distmat, dim):
     """Computes an approximate MDS mapping of an (unknown) full distance
     matrix using a kxn seed distance matrix.
 
     Returned matrix has the shape seed_distmat.shape[1] x dim
     """
-
 
     if not seed_distmat.shape[0] < seed_distmat.shape[1]:
         raise ValueError("seed distance matrix should"
@@ -726,18 +715,18 @@ def nystrom(seed_distmat, dim):
     # matrix E: extract columns 1--nseed
     #
     matrix_e = seed_distmat[:, 0:nseeds]
-    #print("INFO: Extracted Matrix E which is of shape %dx%d" %
+    # print("INFO: Extracted Matrix E which is of shape %dx%d" %
     #      (matrix_e.shape))
 
     # matrix F: extract columns nseed+1--end
     #
     matrix_f = seed_distmat[:, nseeds:]
-    #print("INFO: Extracted Matrix F which is of shape %dx%d" %
+    # print("INFO: Extracted Matrix F which is of shape %dx%d" %
     #      (matrix_f.shape))
 
     # matrix A
     #
-    #print("INFO: Computing Matrix A")
+    # print("INFO: Computing Matrix A")
     t0 = time.clock()
     matrix_a = calc_matrix_a(matrix_e)
     if PRINT_TIMINGS:
@@ -746,15 +735,14 @@ def nystrom(seed_distmat, dim):
 
     # matrix B
     #
-    #print("INFO: Computing Matrix B")
+    # print("INFO: Computing Matrix B")
     t0 = time.clock()
     matrix_b = calc_matrix_b(matrix_e, matrix_f)
     if PRINT_TIMINGS:
         print("TIMING(%s): Computation of B took %f CPU secs" %
               (__name__, time.clock() - t0))
 
-
-    #print("INFO: Eigendecomposing A")
+    # print("INFO: Eigendecomposing A")
     t0 = time.clock()
     # eigh: eigen decomposition for symmetric matrices
     # returns: w, v
@@ -774,17 +762,16 @@ def nystrom(seed_distmat, dim):
     eigval_a = eigval_a[ind]
     eigvec_a = eigvec_a[:, ind]
 
-
-    #print("INFO: Estimating MDS coords")
+    # print("INFO: Estimating MDS coords")
     t0 = time.clock()
-    result = zeros((nfull, dim)) # X in Platt 2005
+    result = zeros((nfull, dim))  # X in Platt 2005
     # Preventing negative eigenvalues by using abs value. Other option
     # is to set negative values to zero. Fabian recommends using
     # absolute values (as in SVD)
     sqrt_eigval_a = sqrt(abs(eigval_a))
     for i in xrange(nfull):
         for j in xrange(dim):
-            if i+1 <= nseeds:
+            if i + 1 <= nseeds:
                 val = sqrt_eigval_a[j] * eigvec_a[i, j]
             else:
                 # - original, unoptimised code-block
@@ -799,13 +786,14 @@ def nystrom(seed_distmat, dim):
                 #
                 # - slightly optimised version: twice as fast on a seedmat of
                 #   size 750 x 3000
-                #a_mb = array([matrix_b[p, i-nseeds] for p in xrange(nseeds)])
-                #a_eva = array([eigvec_a[p, j] for p in xrange(nseeds)])
-                #val = (a_mb*a_eva).sum() / sqrt_eigval_a[j]
+                # a_mb = array([matrix_b[p, i-nseeds] for p in xrange(nseeds)])
+                # a_eva = array([eigvec_a[p, j] for p in xrange(nseeds)])
+                # val = (a_mb*a_eva).sum() / sqrt_eigval_a[j]
                 #
                 # - optmisation suggested by daniel:
                 # 100fold increase on a seedmat of size 750 x 3000
-                numerator = (matrix_b[:nseeds, i-nseeds] * eigvec_a[:nseeds, j]).sum()
+                numerator = (matrix_b[:nseeds, i - nseeds]
+                             * eigvec_a[:nseeds, j]).sum()
                 val = numerator / sqrt_eigval_a[j]
 
             result[i, j] = val
@@ -816,27 +804,31 @@ def nystrom(seed_distmat, dim):
 
     return result
 
-### These functions are a modification from the notes from Andreas
-### implemented by Antonio
+# These functions are a modification from the notes from Andreas
+# implemented by Antonio
 
 # def run_nystrom(num_objects, num_seeds, dim, dist_func, permute_order=True):
+
+
 def run_nystrom(num_objects, num_seeds, dim, dist_func, permute_order=True):
     """ run Nystrom on a distance matrix
 
-    Fast computation of an approximate MDS mapping / PCoA of an (yet unknown) full
-    distance matrix. Returned MDS coordinates have the shape num_objects x dim.
+    Fast computation of an approximate MDS mapping / PCoA of an (yet unknown)
+    full distance matrix. Returned MDS coordinates have the shape
+    num_objects x dim.
 
-  	  inputs:
+          inputs:
     - num_objects: total number of objects to compute mapping for.
-    - num_seeds: number of seeds objects. high means more exact solution, but the slower
+    - num_seeds: number of seeds objects. high means more exact solution,
+                 but the slower
     - dim: dimensionality of MDS mapping
-    - dist_func: callable distance function. arguments should be i,j, with inde
-      range 0..num_objects-1
-    - permute_order: permute order of objects. recommended to avoid caveeats with ordered
-      data that might lead to distorted results. permutation is random. run several times
-      for benchmarking.
+    - dist_func: callable distance function. arguments should be i,j, with
+                 index range 0..num_objects-1
+    - permute_order: permute order of objects. recommended to avoid caveeats
+                     with ordered data that might lead to distorted results.
+                     permutation is random. run several times for benchmarking.
     """
-    #picked_seeds = argsort(restore_idxs)[:num_seeds]
+    # picked_seeds = argsort(restore_idxs)[:num_seeds]
 
     mds_coords = nystrom(seed_distmat, dim)
 
@@ -844,23 +836,27 @@ def run_nystrom(num_objects, num_seeds, dim, dist_func, permute_order=True):
     # altered during seed matrix calculation
     return mds_coords[restore_idxs]
 
-def run_scmds(num_objects, tile_size, tile_overlap, dim, dist_func, permute_order=True):
+
+def run_scmds(num_objects, tile_size, tile_overlap, dim,
+              dist_func, permute_order=True):
     """ run SCMDS on a distance matrix
 
-    Fast MDS approxmiation SCMDS. Breaks (unknown) distance matrix into smaller chunks
-    (tiles), computes MDS solutions for each of these and joins them to one form a full
-    approximatiom.
+    Fast MDS approxmiation SCMDS. Breaks (unknown) distance matrix into smaller
+    chunks (tiles), computes MDS solutions for each of these and joins them to
+    one form a full approximatiom.
 
     inputs:
     - num_objects: number of objects in distance matrix
-    - tile_size: size of tiles/submatrices. the bigger, the slower but the better the
-    approximation
+    - tile_size: size of tiles/submatrices. the bigger, the slower but the
+                 better the approximation
     - tile_overlap: overlap of tiles. has to be bigger than dimensionality
     - dim: requested dimensionality of MDS approximation
-    - dist_func: distance function to compute distance between two objects x and y. valid
-    index range for x and y should be 0..num_objects-1
-    - permute_order: permute input order if True. reduces distortion. order of returned
-    coordinates is kept fixed in either case.
+    - dist_func: distance function to compute distance between two objects
+                 x and y. valid index range for x and y should be
+                 0..num_objects-1
+    - permute_order: permute input order if True. reduces distortion.
+                     order of returned coordinates is kept fixed in
+                     either case.
     """
 
     if num_objects < tile_size:
@@ -882,8 +878,8 @@ def run_scmds(num_objects, tile_size, tile_overlap, dim, dist_func, permute_orde
     else:
         order = range(num_objects)
 
-    ntiles = floor((num_objects - tile_size) / \
-                         (tile_size - tile_overlap))+1
+    ntiles = floor((num_objects - tile_size) /
+                   (tile_size - tile_overlap)) + 1
     assert ntiles != 0, "Internal error: can't use 0 tiles!"
 
     # loop over all ntiles, overlapping tiles. apply mds to each
@@ -892,24 +888,21 @@ def run_scmds(num_objects, tile_size, tile_overlap, dim, dist_func, permute_orde
     tile_no = 1
     tile_start = 0
     tile_end = tile_size + \
-               ((num_objects-tile_size) % (tile_size-tile_overlap))
+        ((num_objects - tile_size) % (tile_size - tile_overlap))
     comb_mds = CombineMds()
     while tile_end <= num_objects:
         # beware: tile_size is just the ideal tile_size, i.e.
         # tile_end-tile_start might not be the same, especially for
         # the last tile
-        this_tile_size = tile_end-tile_start
+        this_tile_size = tile_end - tile_start
 
         # construct a tile (submatrix)
         tile = zeros((this_tile_size, this_tile_size))
         for i in xrange(this_tile_size):
-            for j in xrange(i+1, this_tile_size):
-                tile[i, j] = dist_func(order[i+tile_start],
-                                       order[j+tile_start])
+            for j in xrange(i + 1, this_tile_size):
+                tile[i, j] = dist_func(order[i + tile_start],
+                                       order[j + tile_start])
                 tile[j, i] = tile[i, j]
-
-        #print("INFO: Working on tile with idxs %d:%d gives tile shape %d:%d" % \
-        #      (tile_start, tile_end, tile.shape[0], tile.shape[1]))
 
         # Apply MDS on this tile
         #
@@ -921,19 +914,20 @@ def run_scmds(num_objects, tile_size, tile_overlap, dim, dist_func, permute_orde
         #
         # (slower) alternative is:
         #
-        #(tile_tile_eigvecs, tile_eigval) = qiime_pcoa.pcoa(tile)
-        # pcoa computes all dims so cut down
-        #tile_tile_eigvecs = tile_tile_eigvecs[:, 0:dim]
-
+        # (tile_tile_eigvecs, tile_eigval) = qiime_pcoa.pcoa(tile)
+        #  pcoa computes all dims so cut down
+        # tile_tile_eigvecs = tile_tile_eigvecs[:, 0:dim]
 
         # Add MDS solution to the growing overall solution
         #
         t0 = time.clock()
         comb_mds.add(tile_eigvecs, tile_overlap)
         if PRINT_TIMINGS:
-            print("TIMING(%s): adding of tile %d (shape %d:%d) took %f CPU secs" %
-                  (__name__, tile_no,
-                   tile_eigvecs.shape[0], tile_eigvecs.shape[1], time.clock() - t0))
+            print("TIMING(%s): adding of tile %d (shape %d:%d) "
+                  "took %f CPU secs" % (__name__, tile_no,
+                                        tile_eigvecs.shape[0],
+                                        tile_eigvecs.shape[1],
+                                        time.clock() - t0))
 
         tile_start = tile_end - tile_overlap
         tile_end = tile_end + tile_size - tile_overlap
