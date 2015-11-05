@@ -7,7 +7,7 @@ from mdsa.approximate_mds \
 from mdsa.approximate_mds import rowmeans, \
     affine_mapping, adjust_mds_to_ref, recenter, combine_mds, \
     cmds_tzeng, CombineMds
-from numpy import array, matrix, random, argsort, loadtxt
+from numpy import matrix, random, argsort, loadtxt
 from skbio.util import get_data_path
 
 PRINT_STRESS = False
@@ -215,9 +215,9 @@ class FastMetricNystromScalingTests(TestCase):
         """
 
         seedmat_dim = 10
-        dist_func = lambda x, y: (FULL_SYM_MATRIX[x, y])
         (seedmat, order) = build_seed_matrix(
-            FULL_SYM_MATRIX.shape[0], seedmat_dim, dist_func)
+            FULL_SYM_MATRIX.shape[0], seedmat_dim,
+            lambda x, y: (FULL_SYM_MATRIX[x, y]))
         self.assertTrue(len(order) == FULL_SYM_MATRIX.shape[0])
         self.assertTrue(sorted(order) == range(FULL_SYM_MATRIX.shape[0]))
         self.assertTrue(seedmat.shape == (

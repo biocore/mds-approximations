@@ -1,5 +1,6 @@
 from mdsa.approximate_mds import principal_coordinates_analysis
 
+
 def nystrom(dm, k=10):
     """ Performs nystrom approximation of pca
 

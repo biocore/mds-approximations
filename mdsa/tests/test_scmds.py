@@ -12,5 +12,5 @@ class TestSCMDS(unittest.TestCase):
     def test_scmds(self):
         scmds(self.test_matrix)
 
-if __name__=='__main__':
+if __name__ == '__main__':
     unittest.main()
