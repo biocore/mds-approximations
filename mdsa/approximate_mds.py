@@ -792,9 +792,8 @@ def nystrom(seed_distmat, dim):
                 #
                 # - optmisation suggested by daniel:
                 # 100fold increase on a seedmat of size 750 x 3000
-                numerator = (matrix_b[:nseeds, i - nseeds]
-                             * eigvec_a[:nseeds, j]).sum()
-                val = numerator / sqrt_eigval_a[j]
+                num = (matrix_b[:nseeds, i - nseeds] * eigvec_a[:nseeds, j])
+                val = num.sum() / sqrt_eigval_a[j]
 
             result[i, j] = val
 
