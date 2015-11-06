@@ -12,7 +12,7 @@ before_install:
   # Update conda itself
   - conda update --yes conda
 install:
-  - conda create --yes -n testaroo python=$PYTHON_VERSION numpy scipy matplotlib pandas scikit-learn ipython cython nose pep8 flake8 pip
+  - conda create --yes -n testaroo python=$PYTHON_VERSION numpy scipy matplotlib pandas scikit-learn scikit-bio ipython cython nose pep8 flake8 pip
   - if [ ${USE_CYTHON} ]; then conda install --yes -n testaroo cython; fi
   - source activate testaroo
   - pip install . --no-deps
