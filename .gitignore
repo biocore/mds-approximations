@@ -43,3 +43,6 @@ pip-log.txt
 
 # unwanted files
 .ipynb_checkpoints
+
+# IntelliJ Idea / PyCharm
+.idea/
