@@ -56,7 +56,8 @@ setup(name='mdsa',
           'pandas >= 0.16.2',
           'scipy >= 0.15.1',
           'scikit-bio>=0.4.0',
-          'sklearn'
+          'sklearn',
+          'click'
       ],
       extras_require={'test': ["nose", "pep8", "flake8"]},
       classifiers=classifiers)
