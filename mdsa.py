@@ -13,12 +13,13 @@ from mdsa.algorithms.scmds import Scmds
 Algorithm.register(Nystrom())
 Algorithm.register(Scmds())
 
+
 @click.group()
 def main():
     click.echo('Multidimensional scaling approximations. For command line options, re-run with --help flag.')
 
 
-@click.command()
+@main.command()
 @click.option('--verbosity', type=click.Choice(['quiet', 'default', 'verbose']), default='verbose',
               help='Python unittest package: level of detail to display in output')
 @click.option('--directory', type=click.Path(), default='.',
@@ -32,10 +33,7 @@ def test(verbosity, directory):
     unittest.TextTestRunner(verbosity=verbosity_codes[verbosity]).run(testsuite)
 
 
-main.add_command(test)
-
-
-@click.command()
+@main.command()
 # inputfile = Path to input .txt file containing a numpy-readable distance matrix
 @click.argument('inputfile', type=click.File('r'))
 @click.option('--outpath', type=click.Path(), default='./out', help='Directory where we should output .txt files.')
@@ -108,9 +106,6 @@ def format_pcoa_output(eigenvectors, eigenvalues, percentages):
     str_out += '\n'
 
     return str_out
-
-
-main.add_command(run)
 
 if __name__ == '__main__':
     main()
