@@ -10,7 +10,7 @@ class Algorithm(object):
     @abstractmethod
     def run(self, distance_matrix, num_dimensions_out=10):
         """
-        Performs approximation of Principal Coordinate Analysis (PcoA) using given algorithm.
+        Performs approximation of Principal Coordinate Analysis (PCoA) using given algorithm.
         Returns the principal coordinate results (not necessarily sorted).
 
         Parameters
