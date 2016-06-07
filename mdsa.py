@@ -9,14 +9,13 @@ from mdsa.algorithm import Algorithm
 from mdsa.algorithms.nystrom import Nystrom
 from mdsa.algorithms.scmds import Scmds
 
+# Register algorithms here
+Algorithm.register(Nystrom())
+Algorithm.register(Scmds())
 
 @click.group()
 def main():
     click.echo('Multidimensional scaling approximations. For command line options, re-run with --help flag.')
-
-    # Register algorithms here
-    Algorithm.register(Nystrom())
-    Algorithm.register(Scmds())
 
 
 @click.command()
