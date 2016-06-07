@@ -1,14 +1,11 @@
 from unittest import TestCase, main
-from mdsa import goodness_of_fit
-from mdsa.approximate_mds \
-    import nystrom
-from mdsa.approximate_mds \
-    import calc_matrix_a, calc_matrix_b, build_seed_matrix
+
+from numpy import matrix, loadtxt
+from skbio.util import get_data_path
+
 from mdsa.approximate_mds import rowmeans, \
     affine_mapping, adjust_mds_to_ref, recenter, combine_mds, \
     cmds_tzeng, CombineMds
-from numpy import matrix, random, argsort, loadtxt
-from skbio.util import get_data_path
 
 PRINT_STRESS = False
 
@@ -188,100 +185,6 @@ class FastMetricScmdsScalingTests(TestCase):
         self.assertTrue(final_mds.shape == (r * 2 - overlap, c))
         # self.assertAlmostEqual(final_mds[0, 0], 0.0393279)
         # self.assertAlmostEqual(final_mds[-1, -1], -5.322599)
-
-
-class FastMetricNystromScalingTests(TestCase):
-    """test the functions to do metric scaling"""
-
-    def setUp(self):
-        """creates inputs"""
-
-        self.big_seed_matrix = FULL_SYM_MATRIX[:49]
-        self.small_seed_matrix = FULL_SYM_MATRIX[:25]
-
-    def test_calc_matrix_a(self):
-        """calc_matrix_a should calculate a k x k matrix of
-        (predefined) association matrix K of certain (predefined)
-        value"""
-
-        nseeds = self.small_seed_matrix.shape[0]
-        matrix_e = self.small_seed_matrix[:, 0:nseeds]
-        matrix_a = calc_matrix_a(matrix_e)
-        self.assertAlmostEqual(matrix_a[0, 0], 250.032270, places=5)
-        self.assertAlmostEqual(matrix_a[-1][-1], 316.875461, places=5)
-
-    def test_nystrom_build_seed_matrix(self):
-        """build_seed_matrix() should return a seedmatrix and an order
-        """
-
-        seedmat_dim = 10
-        (seedmat, order) = build_seed_matrix(
-            FULL_SYM_MATRIX.shape[0], seedmat_dim,
-            lambda x, y: (FULL_SYM_MATRIX[x, y]))
-        self.assertTrue(len(order) == FULL_SYM_MATRIX.shape[0])
-        self.assertTrue(sorted(order) == range(FULL_SYM_MATRIX.shape[0]))
-        self.assertTrue(seedmat.shape == (
-            seedmat_dim, FULL_SYM_MATRIX.shape[0]))
-
-        # build_seed_matrix randomises order
-        ind = argsort(order)
-        i = random.randint(0, seedmat.shape[0])
-        j = random.randint(0, seedmat.shape[1])
-        self.assertAlmostEqual(seedmat[i, j], FULL_SYM_MATRIX[ind[i], ind[j]],
-                               places=5)
-
-    def test_nystrom(self):
-        """nystrom() should return an MDS approximation"""
-
-        dim = 3
-        mds_coords = nystrom(self.big_seed_matrix, dim)
-        self.assertTrue(len(mds_coords.shape) == 2)
-        self.assertTrue(mds_coords.shape[0] == self.big_seed_matrix.shape[1])
-        self.assertTrue(mds_coords.shape[1] == dim)
-        self.assertAlmostEqual(mds_coords[0, 0], -10.709626, places=5)
-        self.assertAlmostEqual(mds_coords[-1, -1], -1.778160, places=5)
-
-    def test_nystrom_seed_number(self):
-        """nystrom() should give better MDS approximations the more
-        seeds were used"""
-
-        dim = 3
-        mds_coords = nystrom(self.big_seed_matrix, dim)
-        stress = goodness_of_fit.Stress(FULL_SYM_MATRIX, mds_coords)
-        kruskal_stress_big_mat = stress.calcKruskalStress()
-        if PRINT_STRESS:
-            print("INFO: Kruskal stress for Nystrom MDS "
-                  "(big_seed_matrix, dim=%d) = %f" %
-                  (dim, kruskal_stress_big_mat))
-        self.assertTrue(kruskal_stress_big_mat < 0.04)
-
-        mds_coords = nystrom(self.small_seed_matrix, dim)
-        stress = goodness_of_fit.Stress(FULL_SYM_MATRIX, mds_coords)
-        kruskal_stress_small_mat = stress.calcKruskalStress()
-        if PRINT_STRESS:
-            print("INFO: Kruskal stress for Nystrom MDS "
-                  "(small_seed_matrix, dim=%d) = %f" %
-                  (dim, kruskal_stress_small_mat))
-        self.assertTrue(kruskal_stress_small_mat < 0.06)
-
-        self.assertTrue(kruskal_stress_small_mat > kruskal_stress_big_mat)
-
-    def test_calc_matrix_b(self):
-        """calc_matrix_b should calculate a k x n-k matrix of
-        association matrix K
-        """
-
-        nseeds = self.small_seed_matrix.shape[0]
-        matrix_e = self.small_seed_matrix[:, 0:nseeds]
-        matrix_f = self.small_seed_matrix[:, nseeds:]
-        matrix_b = calc_matrix_b(matrix_e, matrix_f)
-
-        self.assertTrue(matrix_b.shape == matrix_f.shape)
-        self.assertAlmostEqual(matrix_b[0, 0], -272.711227,
-                               places=5)
-        self.assertAlmostEqual(matrix_b[-1, -1], -64.898372,
-                               places=5)
-
 
 # run if called from the command line
 if __name__ == '__main__':

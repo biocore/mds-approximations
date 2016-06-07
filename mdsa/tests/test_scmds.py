@@ -1,8 +1,9 @@
-import numpy as np
 import unittest
-from mdsa.scmds import scmds
 
+import numpy as np
 from skbio.util import get_data_path
+
+from mdsa.algorithms.scmds import scmds
 
 
 class TestSCMDS(unittest.TestCase):
