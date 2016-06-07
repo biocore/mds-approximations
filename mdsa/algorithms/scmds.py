@@ -66,8 +66,8 @@ class Scmds(Algorithm):
             curr_tile_size = tile_end - tile_start
 
         eigenvectors = array(self.combine_mds.getFinalMDS())
-        eigenvalues = ['NaN'] * num_dimensions_out
-        percentages = ['NaN'] * num_dimensions_out
+        eigenvalues = [float('nan')] * num_dimensions_out
+        percentages = [float('nan')] * num_dimensions_out
         return eigenvectors, eigenvalues, percentages
 
     def _cmds_tzeng(self, distmat, dim=None):

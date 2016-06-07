@@ -93,8 +93,8 @@ class Nystrom(Algorithm):
 
         eigenvectors = self._nystrom(sample_distmtx, num_dimensions_out)
 
-        eigenvalues = ['NaN'] * num_dimensions_out
-        percentages = ['NaN'] * num_dimensions_out
+        eigenvalues = [float('nan')] * num_dimensions_out
+        percentages = [float('nan')] * num_dimensions_out
         return array(eigenvectors), array(eigenvalues), array(percentages)
 
     def _nystrom(self, seed_distmat, dimensions, PRINT_TIMINGS=False):
