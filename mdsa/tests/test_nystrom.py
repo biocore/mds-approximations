@@ -20,6 +20,9 @@ class TestNystrom(unittest.TestCase):
         self.big_seed_matrix = self.test_matrix[:49]
         self.small_seed_matrix = self.test_matrix[:25]
 
+    def test_nystrom(self):
+        self.nystrom.run(self.test_matrix)
+
     def test_nystrom_build_seed_matrix(self):
         """build_seed_matrix() should return a seedmatrix and an order
         """
