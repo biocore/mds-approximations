@@ -11,7 +11,9 @@ class Algorithm(object):
 
     @abstractmethod
     def run(self, distance_matrix, num_dimensions_out=10):
-        """ Performs approximation of Principal Component Analysis using given algorithm
+        """
+        Performs approximation of Principal Coordinate Analysis (PcoA) using given algorithm.
+        Returns the principal coordinate results (not necessarily sorted).
 
         Parameters
         ----------
@@ -24,9 +26,10 @@ class Algorithm(object):
         Returns
         -------
         eigenvectors : np.array
-            Eigenvectors, i.e. an array of coordinates
+            Eigenvectors, where each row is an axis and the columns are points within the axis
         eigenvalues : np.array
-            Eigenvalues
+            Eigenvalues corresponding to the rows, indicating the amount of the variation that
+            the axis in that row accounts for
         percentages: np.array
             Percentage of variation explained per coordinate
         """
