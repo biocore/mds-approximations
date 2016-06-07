@@ -7,8 +7,6 @@ class Algorithm(object):
     def __init__(self, algorithm_name):
         self.name = algorithm_name
 
-        Algorithm.algorithms[self.name] = self
-
     @abstractmethod
     def run(self, distance_matrix, num_dimensions_out=10):
         """
@@ -38,3 +36,9 @@ class Algorithm(object):
     @staticmethod
     def get_algorithm(algorithm_name):
         return Algorithm.algorithms[algorithm_name]
+
+    @staticmethod
+    def register(algorithm):
+        if not isinstance(algorithm, Algorithm):
+            raise ValueError('Expecting a subclass of Algorithm.')
+        Algorithm.algorithms[algorithm.name] = algorithm
