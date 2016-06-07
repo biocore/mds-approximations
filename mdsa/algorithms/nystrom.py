@@ -9,7 +9,75 @@ from numpy.linalg import eigh
 
 from mdsa.algorithm import Algorithm
 
+"""
+===================== Nystrom =====================
 
+Approximates an MDS mapping / a (partial) PCoA solution of an
+(unknown) full distance matrix using a k x n seed distance matrix.
+
+Use if you have a very high number of objects or if each distance
+caculation is expensive. Speedup comes from two factors: 1. Not all
+distances are calculated but only k x n. 2. Eigendecomposition is only
+applied to a k x k matrix.
+
+Calculations done after Platt (2005). See
+http://research.microsoft.com/apps/pubs/?id=69185 :
+``This paper unifies the mathematical foundation of three
+multidimensional scaling algorithms: FastMap, MetricMap, and Landmark
+MDS (LMDS). All three algorithms are based on the Nystrom
+approximation of the eigenvectors and eigenvalues of a matrix. LMDS is
+applies the basic Nystrom approximation, while FastMap and MetricMap
+use generalizations of Nystrom, including deflation and using more
+points to establish an embedding. Empirical experiments on the Reuters
+and Corel Image Features data sets show that the basic Nystrom
+approximation outperforms these generalizations: LMDS is more accurate
+than FastMap and MetricMap with roughly the same computation and can
+become even more accurate if allowed to be slower.``
+
+
+Assume a full distance matrix D for N objects:
+
+        /  E  |  F \
+    D = |-----|----|
+        \ F.t |  G /
+
+
+The correspondong association matrix or centered inner-product
+matrix K is:
+
+        /  A  |  B \
+    K = |-----|----|
+        \ B.t |  C /
+
+where A and B are computed as follows
+
+    A_ij = - 0.50 * (E_ij^2 -
+                 1/m SUM_p E_pj^2 -
+                 1/m SUM_q E_iq^2 +
+                 1/m^2 SUM_q E_pq^2
+
+B is computed as in Landmark MDS, because it's simpler and works
+better according to Platt):
+
+    B_ij = - 0.50 * (F_ij^2 - 1/m SUM_q E_iq^2)
+
+
+In order to approximate an MDS mapping for full matrix you only need E
+and F from D as seed matrix. This will mimick the distances for m seed
+objects. E is of dimension m x m and F of m x (N-m)
+
+E and F are then used to approximate and MDS solution x for the full
+distance matrix:
+
+
+x_ij =  sqrt(g_j) * U_ij, if i<=m
+        and
+        SUM_p B_pi U_pj / sqrt(g_j)
+
+where U_ij is the i'th component of the jth eigenvector of A (see
+below) and g_j is the j'th eigenvalue of A.  The index j only runs
+from 1 to k in order to make a k dimensional embedding.
+"""
 class Nystrom(Algorithm):
     def __init__(self):
         super(Nystrom, self).__init__(algorithm_name='nystrom')
