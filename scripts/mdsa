@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os
 import unittest
 
@@ -16,43 +18,62 @@ Algorithm.register(Scmds())
 
 @click.group()
 def main():
-    click.echo('Multidimensional scaling approximations. For command line options, re-run with --help flag.\n')
+    """
+    Multidimensional scaling approximations. For command line options,
+    re-run with --help flag.
+    """
+    pass
 
 
 @main.command()
-@click.option('--verbosity', type=click.Choice(['quiet', 'default', 'verbose']), default='verbose',
-              help='Python unittest package: level of detail to display in output')
+@click.option('--verbosity',
+              type=click.Choice(['quiet', 'default', 'verbose']),
+              default='verbose',
+              help='Python unittest package: level of detail to display in '
+                   'output')
 @click.option('--directory', type=click.Path(), default='.',
               help='Relative path of directory containing tests')
 def test(verbosity, directory):
-    click.echo('Running tests via unittest from directory (output verbosity level: %s): %s' % (verbosity, directory))
+    click.echo(
+        'Running tests via unittest from directory (output verbosity level: '
+        '%s): %s' % (verbosity, directory))
     verbosity_codes = dict(quiet=0, default=1, verbose=2)
 
     # Run all tests
     testsuite = unittest.TestLoader().discover(directory)
-    unittest.TextTestRunner(verbosity=verbosity_codes[verbosity]).run(testsuite)
+    unittest.TextTestRunner(verbosity=verbosity_codes[verbosity]).\
+        run(testsuite)
 
 
 @main.command()
-# inputfile = Path to input .txt file containing a numpy-readable distance matrix
+# inputfile = Path to input .txt file containing a numpy-readable distance
+# matrix
 @click.argument('inputfile', type=click.File('r'))
-@click.option('--outpath', type=click.Path(), default='./out', help='Directory where we should output .txt files.')
-@click.option('--algorithm', 'algorithms', type=str, default=['all'], multiple=True,
+@click.option('--outpath', type=click.Path(), default='./out',
+              help='Directory where we should output .txt files.')
+@click.option('--algorithm', 'algorithms', type=str, default=['all'],
+              multiple=True,
               help='Algorithm to run. Pass multiple '
                    '`--algorithm alg_name_here` flags to run '
                    'more than one. Omit entirely to run all.\n'
                    'Algorithms: %s' % (', '.join(Algorithm.algorithms.keys())))
-@click.option('--dimensions', type=int, default=10, help='Number of dimensions to reduce distance matrix to.'
-                                                         'Ensure this parameter is less tahn the dimensionality of the'
-                                                         ' input distance matrix)')
+@click.option('--dimensions', type=int, default=10,
+              help='Number of dimensions to reduce distance matrix to.'
+                   'Ensure this parameter is less tahn the dimensionality of '
+                   'the'
+                   ' input distance matrix)')
 def run(inputfile, outpath, algorithms, dimensions):
     """
-    Run a Principle Coordinate Analysis (PCoA) the given algorithm(s) on a distance matrix.
-    The distance matrix is loaded from INPUTFILE which must have extension .txt and be formatted as a
+    Run a Principle Coordinate Analysis (PCoA) the given algorithm(s) on a
+    distance matrix.
+    The distance matrix is loaded from INPUTFILE which must have extension
+    .txt and be formatted as a
     scikit bio labeled square matrix file format (lsmat).
     """
-    click.echo('Running these algorithms on given matrix (from `%s` and outputting to `%s`): %s\n'
-               % (inputfile.name, outpath, ', '.join(algorithms)))
+    click.echo(
+        'Running these algorithms on given matrix (from `%s` and outputting '
+        'to `%s`): %s\n'
+        % (inputfile.name, outpath, ', '.join(algorithms)))
 
     input_matrix = DistanceMatrix.read(inputfile.name, format='lsmat')
 
@@ -61,11 +82,15 @@ def run(inputfile, outpath, algorithms, dimensions):
 
     # Run algorithms
     for algorithm_name in algorithms:
-        click.echo('> Running algorithm %s on distance matrix from input file: %s' % (algorithm_name, inputfile.name))
+        click.echo(
+            '> Running algorithm %s on distance matrix from input file: %s' %
+            (algorithm_name, inputfile.name))
         algorithm = Algorithm.get_algorithm(algorithm_name)
-        eigenvectors, eigenvalues, percentages = algorithm.run(input_matrix, num_dimensions_out=dimensions)
+        eigenvectors, eigenvalues, percentages = \
+            algorithm.run(input_matrix, num_dimensions_out=dimensions)
 
-        formatted_pcoa_output = format_pcoa_output(eigenvectors, eigenvalues, percentages)
+        formatted_pcoa_output = format_pcoa_output(eigenvectors, eigenvalues,
+                                                   percentages)
 
         outfile_full_path = os.path.join(outpath, algorithm_name + '.txt')
 
@@ -97,7 +122,9 @@ def format_pcoa_output(eigenvectors, eigenvalues, percentages):
 
     # Output proportion explained percentages
     if len(percentages) > 0 and not np.all(np.isnan(percentages)):
-        str_out += 'Proportion explained as percentages \t(%d total)\n\n' % len(percentages)
+        str_out += 'Proportion explained as percentages \t(%d total)\n\n' % \
+                   len(
+            percentages)
         for percentage in eigenvalues:
             str_out += str(percentage)
             str_out += '%\n'
@@ -113,6 +140,7 @@ def format_pcoa_output(eigenvectors, eigenvalues, percentages):
     str_out += '\n'
 
     return str_out
+
 
 if __name__ == '__main__':
     main()

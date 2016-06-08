@@ -6,4 +6,7 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import algorithms
+
 __version__ = '0.0.1-dev'
+__all__ = ['algorithms']

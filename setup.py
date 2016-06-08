@@ -59,5 +59,6 @@ setup(name='mdsa',
           'scikit-learn',
           'click'
       ],
+      scripts=['scripts/mdsa'],
       extras_require={'test': ["nose", "pep8", "flake8"]},
       classifiers=classifiers)
