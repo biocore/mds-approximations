@@ -29,6 +29,8 @@ class Scmds(Algorithm):
         self.combine_mds = CombineMds()
 
     def run(self, distance_matrix, num_dimensions_out=10):
+        distance_matrix = distance_matrix.data
+
         num_objects = distance_matrix.shape[0]
         tile_size = int(num_objects * 0.6)
         tile_overlap = int(tile_size * 0.09)

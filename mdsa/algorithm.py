@@ -15,8 +15,8 @@ class Algorithm(object):
 
         Parameters
         ----------
-        distance_matrix : np.array
-            Distance matrix
+        distance_matrix : skbio.DistanceMatrix
+            scikit-bio distance matrix object
         num_dimensions_out : int
             Number of dimensions (i.e. eigenvectors)
             to return, i.e. what dimensionality to approximate given distance matrix to.

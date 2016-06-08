@@ -2,6 +2,7 @@ import unittest
 
 import numpy as np
 from numpy import matrix
+from skbio import DistanceMatrix
 from skbio.util import get_data_path
 
 from mdsa.algorithms.scmds import Scmds, CombineMds
@@ -15,7 +16,9 @@ class TestSCMDS(unittest.TestCase):
         self.scmds = Scmds()
 
     def test_scmds(self):
-        self.scmds.run(self.test_matrix)
+        # wrap self.test_matrix in an skbio distance matrix
+        distance_matrix = DistanceMatrix(self.test_matrix, [str(id_) for id_ in xrange(self.test_matrix.shape[0])])
+        self.scmds.run(distance_matrix)
 
     def test_scmds_cmds_tzeng(self):
         """cmds_tzeng() should return eigenvectors and eigenvalues,

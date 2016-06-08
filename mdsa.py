@@ -1,9 +1,9 @@
 import os
 import unittest
-from pprint import pprint, pformat
 
 import click
 import numpy as np
+from skbio import DistanceMatrix
 
 from mdsa.algorithm import Algorithm
 from mdsa.algorithms.nystrom import Nystrom
@@ -16,7 +16,7 @@ Algorithm.register(Scmds())
 
 @click.group()
 def main():
-    click.echo('Multidimensional scaling approximations. For command line options, re-run with --help flag.')
+    click.echo('Multidimensional scaling approximations. For command line options, re-run with --help flag.\n')
 
 
 @main.command()
@@ -43,11 +43,15 @@ def test(verbosity, directory):
                    'more than one. Omit entirely to run all.\n'
                    'Algorithms: %s' % (', '.join(Algorithm.algorithms.keys())))
 def run(inputfile, outpath, algorithms):
+    """
+    Run a Principle Coordinate Analysis (PCoA) the given algorithm(s) on a distance matrix.
+    The distance matrix is loaded from INPUTFILE which must have extension .txt and be formatted as a
+    scikit bio labeled square matrix file format (lsmat).
+    """
     click.echo('Running these algorithms on given matrix (from `%s` and outputting to `%s`): %s\n'
                % (inputfile.name, outpath, ', '.join(algorithms)))
 
-    # TODO: sanity-check the format of this file and document supported input formats
-    input_matrix = np.loadtxt(inputfile.name)
+    input_matrix = DistanceMatrix.read(inputfile.name, format='lsmat')
 
     if len(algorithms) == 1 and algorithms[0] == 'all':
         algorithms = Algorithm.algorithms.keys()

@@ -1,7 +1,8 @@
+import random
 import time
 from math import log
-from random import sample
 
+import numpy as np
 from numpy import argsort
 from numpy import sqrt, power, array
 from numpy import zeros
@@ -78,18 +79,23 @@ where U_ij is the i'th component of the jth eigenvector of A (see
 below) and g_j is the j'th eigenvalue of A.  The index j only runs
 from 1 to k in order to make a k dimensional embedding.
 """
+
+
 class Nystrom(Algorithm):
     def __init__(self):
         super(Nystrom, self).__init__(algorithm_name='nystrom')
 
     def run(self, distance_matrix, num_dimensions_out=10):
+        distance_matrix = distance_matrix.data
+
         n_seeds = int(log(distance_matrix.shape[0], 2)) ** 2
         if n_seeds <= num_dimensions_out:
             n_seeds = num_dimensions_out + 1
         elif n_seeds >= distance_matrix.shape[0]:
             n_seeds = distance_matrix.shape[0] - 1
 
-        sample_distmtx = array(sample(distance_matrix, n_seeds))
+        # Randomly sample n_seeds entries from axis 0
+        sample_distmtx = array(random.sample(distance_matrix, n_seeds))
 
         eigenvectors = self._nystrom(sample_distmtx, num_dimensions_out)
 
@@ -293,7 +299,7 @@ class Nystrom(Algorithm):
             raise ValueError("distance getter function not callable")
 
         if permute_order:
-            picked_seeds = sample(range(fullmat_dim), seedmat_dim)
+            picked_seeds = np.random.sample(range(fullmat_dim), seedmat_dim)
         else:
             picked_seeds = range(seedmat_dim)
         # assert len(picked_seeds) == seedmat_dim, (
@@ -400,6 +406,3 @@ class Nystrom(Algorithm):
         result = -0.5 * (matrix_f ** 2 - array([row_center_e, ] * ncols).transpose())
 
         return result
-
-
-
