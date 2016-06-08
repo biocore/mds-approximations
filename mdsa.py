@@ -42,7 +42,10 @@ def test(verbosity, directory):
                    '`--algorithm alg_name_here` flags to run '
                    'more than one. Omit entirely to run all.\n'
                    'Algorithms: %s' % (', '.join(Algorithm.algorithms.keys())))
-def run(inputfile, outpath, algorithms):
+@click.option('--dimensions', type=int, default=10, help='Number of dimensions to reduce distance matrix to.'
+                                                         'Ensure this parameter is less tahn the dimensionality of the'
+                                                         ' input distance matrix)')
+def run(inputfile, outpath, algorithms, dimensions):
     """
     Run a Principle Coordinate Analysis (PCoA) the given algorithm(s) on a distance matrix.
     The distance matrix is loaded from INPUTFILE which must have extension .txt and be formatted as a
@@ -60,7 +63,7 @@ def run(inputfile, outpath, algorithms):
     for algorithm_name in algorithms:
         click.echo('> Running algorithm %s on distance matrix from input file: %s' % (algorithm_name, inputfile.name))
         algorithm = Algorithm.get_algorithm(algorithm_name)
-        eigenvectors, eigenvalues, percentages = algorithm.run(input_matrix)
+        eigenvectors, eigenvalues, percentages = algorithm.run(input_matrix, num_dimensions_out=dimensions)
 
         formatted_pcoa_output = format_pcoa_output(eigenvectors, eigenvalues, percentages)
 
