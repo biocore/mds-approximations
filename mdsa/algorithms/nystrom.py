@@ -96,7 +96,8 @@ class Nystrom(Algorithm):
             n_seeds = distance_matrix.shape[0] - 1
 
         # Randomly sample n_seeds entries from axis 0
-        sample_distmtx = array(random.sample(distance_matrix, n_seeds))
+        sample_distmtx = distance_matrix[
+            np.random.randint(0, distance_matrix.shape[0], n_seeds)]
 
         eigenvectors = self._nystrom(sample_distmtx, num_dimensions_out)
 
