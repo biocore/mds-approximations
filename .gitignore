@@ -48,4 +48,4 @@ pip-log.txt
 .idea/
 
 # Generated PCoA output of algorithms
-./out/*.*
+out/*
