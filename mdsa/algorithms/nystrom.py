@@ -299,7 +299,7 @@ class Nystrom(Algorithm):
             raise ValueError("distance getter function not callable")
 
         if permute_order:
-            picked_seeds = np.random.sample(range(fullmat_dim), seedmat_dim)
+            picked_seeds = random.sample(range(fullmat_dim), seedmat_dim)
         else:
             picked_seeds = range(seedmat_dim)
         # assert len(picked_seeds) == seedmat_dim, (
