@@ -156,7 +156,8 @@ class Nystrom(Algorithm):
             print("TIMING(%s): Eigendecomposition of A took %f CPU secs" %
                   (__name__, time.clock() - t0))
 
-        # note: for optimization, if nystrom wins out, this is an excellent cython or numba target
+        # note: for optimization, if nystrom wins out, this is an excellent
+        # cython or numba target
         # Sort descending
         ind = argsort(eigval_a)
         ind = ind[::-1]
@@ -184,15 +185,18 @@ class Nystrom(Algorithm):
                     # numerator = sum(matrix_b[p, i-nseeds] * eigvec_a[p, j]
                     #                 for p in xrange(nseeds))
                     #
-                    # - slightly optimised version: twice as fast on a seedmat of
+                    # - slightly optimised version: twice as fast on a seedmat
+                    #  of
                     #   size 750 x 3000
-                    # a_mb = array([matrix_b[p, i-nseeds] for p in xrange(nseeds)])
+                    # a_mb = array([matrix_b[p, i-nseeds] for
+                    # p in xrange(nseeds)])
                     # a_eva = array([eigvec_a[p, j] for p in xrange(nseeds)])
                     # val = (a_mb*a_eva).sum() / sqrt_eigval_a[j]
                     #
                     # - optmisation suggested by daniel:
                     # 100fold increase on a seedmat of size 750 x 3000
-                    num = (matrix_b[:nseeds, i - nseeds] * eigvec_a[:nseeds, j])
+                    num = (matrix_b[:nseeds, i - nseeds]
+                           * eigvec_a[:nseeds, j])
                     val = num.sum() / sqrt_eigval_a[j]
 
                 result[i, j] = val
@@ -265,7 +269,8 @@ class Nystrom(Algorithm):
         return result
 
     @staticmethod
-    def _build_seed_matrix(fullmat_dim, seedmat_dim, getdist, permute_order=True, PRINT_TIMINGS=False):
+    def _build_seed_matrix(fullmat_dim, seedmat_dim, getdist,
+                           permute_order=True, PRINT_TIMINGS=False):
         """Builds a seed matrix of shape seedmat_dim x fullmat_dim
 
         Returns seed-matrix and indices to restore original order (needed
@@ -394,7 +399,8 @@ class Nystrom(Algorithm):
         # - optimised single line version of the code block above. pointed out
         #   by daniel. 20xfaster on a 750x3000 seed-matrix. cloning idea
         #   copied from
-        #   http://stackoverflow.com/questions/1550130/cloning-row-or-column-vectors
-        result = -0.5 * (matrix_f ** 2 - array([row_center_e, ] * ncols).transpose())
+        #   stackoverflow.com/questions/1550130/cloning-row-or-column-vectors
+        result = -0.5 * (matrix_f ** 2 - array([row_center_e, ] * ncols)
+                         .transpose())
 
         return result

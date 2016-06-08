@@ -40,8 +40,8 @@ class Algorithm(object):
             raise ValueError(
                 'Cannot run PCoA on distance_matrix with shape %s and '
                 'num_dimensions_out=%d: '
-                'nothing to reduce!' % (
-                repr(distance_matrix.shape), num_dimensions_out))
+                'nothing to reduce!'
+                % (repr(distance_matrix.shape), num_dimensions_out))
 
     @staticmethod
     def get_algorithm(algorithm_name):

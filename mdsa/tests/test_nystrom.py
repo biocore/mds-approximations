@@ -24,10 +24,9 @@ class TestNystrom(unittest.TestCase):
 
     def test_nystrom(self):
         # wrap self.test_matrix in an skbio distance matrix
-        distance_matrix = DistanceMatrix(self.test_matrix, [str(id_) for id_ in
-                                                            xrange(
-                                                                self.test_matrix.shape[
-                                                                    0])])
+        distance_matrix = DistanceMatrix(self.test_matrix,
+                                         [str(id_) for id_ in
+                                          xrange(self.test_matrix.shape[0])])
         self.nystrom.run(distance_matrix)
 
     def test_nystrom_output_dimensions(self):
