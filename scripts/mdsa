@@ -41,7 +41,7 @@ def test(verbosity, directory):
 
     # Run all tests
     testsuite = unittest.TestLoader().discover(directory)
-    unittest.TextTestRunner(verbosity=verbosity_codes[verbosity]).\
+    unittest.TextTestRunner(verbosity=verbosity_codes[verbosity]). \
         run(testsuite)
 
 
@@ -85,7 +85,16 @@ def run(inputfile, outpath, algorithms, dimensions):
         click.echo(
             '> Running algorithm %s on distance matrix from input file: %s' %
             (algorithm_name, inputfile.name))
-        algorithm = Algorithm.get_algorithm(algorithm_name)
+        try:
+            algorithm = Algorithm.get_algorithm(algorithm_name)
+        except KeyError:
+            click.echo('Algorithm "%s" does not exist. '
+                       'Ensure it is registered in scripts/mdsa through '
+                       'Algorithm.register() and exists in ./mdsa/algorithms, '
+                       'subclassing Algorithm properly.'
+                       % algorithm_name, err=True)
+            return
+
         eigenvectors, eigenvalues, percentages = \
             algorithm.run(input_matrix, num_dimensions_out=dimensions)
 
@@ -124,7 +133,7 @@ def format_pcoa_output(eigenvectors, eigenvalues, percentages):
     if len(percentages) > 0 and not np.all(np.isnan(percentages)):
         str_out += 'Proportion explained as percentages \t(%d total)\n\n' % \
                    len(
-            percentages)
+                       percentages)
         for percentage in eigenvalues:
             str_out += str(percentage)
             str_out += '%\n'
