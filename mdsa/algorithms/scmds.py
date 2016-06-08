@@ -324,8 +324,8 @@ class CombineMds(object):
 
         if mds_ref.shape[1] != mds_add.shape[1]:
             raise ValueError("given mds solutions have different dimensions")
-        if not (mds_ref.shape[0] >= n_overlap and mds_add.shape[
-            0] >= n_overlap):
+        if not (mds_ref.shape[0] >= n_overlap and
+                mds_add.shape[0] >= n_overlap):
             raise ValueError("not enough overlap between given mds mappings")
 
         # Use transposes for affine_mapping!
@@ -335,7 +335,7 @@ class CombineMds(object):
         # paranoia: unitary_op is of type matrix, make sure mds_add
         # is as well so that we can use '*' for matrix multiplication
         mds_add_adj = unitary_op * matrix(mds_add.transpose()) + \
-                      kron(shift_op, ones((1, mds_add.shape[0])))
+            kron(shift_op, ones((1, mds_add.shape[0])))
         mds_add_adj = mds_add_adj.transpose()
 
         return mds_add_adj

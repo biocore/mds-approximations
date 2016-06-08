@@ -195,8 +195,8 @@ class Nystrom(Algorithm):
                     #
                     # - optmisation suggested by daniel:
                     # 100fold increase on a seedmat of size 750 x 3000
-                    num = (matrix_b[:nseeds, i - nseeds]
-                           * eigvec_a[:nseeds, j])
+                    num = \
+                        (matrix_b[:nseeds, i - nseeds] * eigvec_a[:nseeds, j])
                     val = num.sum() / sqrt_eigval_a[j]
 
                 result[i, j] = val
