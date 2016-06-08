@@ -24,6 +24,8 @@ solutions are then joined using an affine mapping approach.
 
 =================================================
 """
+
+
 class Scmds(Algorithm):
     def __init__(self):
         super(Scmds, self).__init__(algorithm_name='scmds')
@@ -41,7 +43,6 @@ class Scmds(Algorithm):
             raise ValueError("The distance matrix is to small to be divided")
         if num_dimensions_out > tile_overlap:
             tile_overlap = num_dimensions_out
-
 
         tile_no = 1
         tile_start = 0
@@ -82,7 +83,8 @@ class Scmds(Algorithm):
 
         Arguments:
         - `distmat`: distance matrix (non-complex, symmetric ndarray)
-        - `dim`:     wanted dimensionality of MDS mapping (defaults to distmat dim)
+        - `dim`:     wanted dimensionality of MDS mapping
+        (defaults to distmat dim)
 
         Implementation as in Matlab prototype of SCMDS, see
         Tzeng J et al. (2008), PMID: 18394154
@@ -248,7 +250,8 @@ class CombineMds(object):
             raise ValueError("input matrices are not of same size")
 
         if not matrix_x.shape[0] <= matrix_x.shape[1]:
-            raise ValueError("input matrices should have more columns than rows")
+            raise ValueError(
+                "input matrices should have more columns than rows")
 
         # Have to check if we have not more rows than columns, otherwise,
         # the qr function below might behave differently in the matlab
@@ -260,7 +263,8 @@ class CombineMds(object):
         # here because we need both return matrices.
         #
         # see
-        # http://www.mathworks.com/access/helpdesk/help/techdoc/index.html?/access/helpdesk/help/techdoc/ref/qr.html
+        # http://www.mathworks.com/access/helpdesk/help/techdoc/index.html
+        # ?/access/helpdesk/help/techdoc/ref/qr.html
         # [Q,R] = qr(A,0) produces the economy-size decomposition.
         # If m > n, only the first n columns of Q and
         # the first n rows of R are computed.
@@ -320,7 +324,8 @@ class CombineMds(object):
 
         if mds_ref.shape[1] != mds_add.shape[1]:
             raise ValueError("given mds solutions have different dimensions")
-        if not (mds_ref.shape[0] >= n_overlap and mds_add.shape[0] >= n_overlap):
+        if not (mds_ref.shape[0] >= n_overlap and mds_add.shape[
+            0] >= n_overlap):
             raise ValueError("not enough overlap between given mds mappings")
 
         # Use transposes for affine_mapping!
@@ -381,8 +386,3 @@ class CombineMds(object):
         # good
 
         return joined_mds
-
-
-
-
-

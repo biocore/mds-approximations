@@ -15,6 +15,7 @@ class TestNystrom(unittest.TestCase):
     """
     Tests functions to do nystrom fast metric scaling
     """
+
     def setUp(self):
         self.test_matrix = np.loadtxt(get_data_path('full_sym_matrix.txt'))
         self.nystrom = Nystrom()
@@ -23,13 +24,18 @@ class TestNystrom(unittest.TestCase):
 
     def test_nystrom(self):
         # wrap self.test_matrix in an skbio distance matrix
-        distance_matrix = DistanceMatrix(self.test_matrix, [str(id_) for id_ in xrange(self.test_matrix.shape[0])])
+        distance_matrix = DistanceMatrix(self.test_matrix, [str(id_) for id_ in
+                                                            xrange(
+                                                                self.test_matrix.shape[
+                                                                    0])])
         self.nystrom.run(distance_matrix)
 
     def test_nystrom_output_dimensions(self):
-        """ Ensure that an incorrect num_dimensions_out parameter triggers an exception """
+        """ Ensure that an incorrect num_dimensions_out parameter triggers
+        an exception """
         with self.assertRaises(ValueError):
-            self.nystrom.run(self.test_matrix, num_dimensions_out=self.test_matrix.shape[0])
+            self.nystrom.run(self.test_matrix,
+                             num_dimensions_out=self.test_matrix.shape[0])
 
     def test_nystrom_build_seed_matrix(self):
         """build_seed_matrix() should return a seedmatrix and an order
@@ -78,7 +84,7 @@ class TestNystrom(unittest.TestCase):
         self.assertAlmostEqual(matrix_b[-1, -1], -64.898372,
                                places=5)
 
-    def test_nystrom(self):
+    def test_nystrom_internal(self):
         """nystrom() should return an MDS approximation"""
 
         dim = 3
@@ -113,6 +119,7 @@ class TestNystrom(unittest.TestCase):
         self.assertTrue(kruskal_stress_small_mat < 0.06)
 
         self.assertTrue(kruskal_stress_small_mat > kruskal_stress_big_mat)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -17,13 +17,17 @@ class TestSCMDS(unittest.TestCase):
 
     def test_scmds(self):
         # wrap self.test_matrix in an skbio distance matrix
-        distance_matrix = DistanceMatrix(self.test_matrix, [str(id_) for id_ in xrange(self.test_matrix.shape[0])])
+        distance_matrix = DistanceMatrix(self.test_matrix,
+                                         [str(id_) for id_ in
+                                          xrange(self.test_matrix.shape[0])])
         self.scmds.run(distance_matrix)
 
     def test_scmds_output_dimensions(self):
-        """ Ensure that an incorrect num_dimensions_out parameter triggers an exception """
+        """ Ensure that an incorrect num_dimensions_out parameter triggers
+        an exception """
         with self.assertRaises(ValueError):
-            self.scmds.run(self.test_matrix, num_dimensions_out=self.test_matrix.shape[0])
+            self.scmds.run(self.test_matrix,
+                           num_dimensions_out=self.test_matrix.shape[0])
 
     def test_scmds_cmds_tzeng(self):
         """cmds_tzeng() should return eigenvectors and eigenvalues,
@@ -119,7 +123,8 @@ class TestSCMDS(unittest.TestCase):
         fake_mds_coords_add = self.test_matrix[overlap:size + overlap, :dim]
 
         mds_adj = self.scmds.combine_mds.adjust_mds_to_ref(fake_mds_coords_ref,
-                                    fake_mds_coords_add, overlap)
+                                                           fake_mds_coords_add,
+                                                           overlap)
         self.assertTrue(mds_adj.shape == fake_mds_coords_add.shape)
         self.assertAlmostEqual(mds_adj[0, 0], 7.526609, places=5)
         self.assertAlmostEqual(mds_adj[-1, -1], 18.009350, places=5)
@@ -144,7 +149,7 @@ class TestSCMDS(unittest.TestCase):
             [4.23608631, 0.7933192, 1.16523198]])
 
         comb_mds = self.scmds.combine_mds.combine_mds(mds_coords_1,
-                               mds_coords_2, overlap)
+                                                      mds_coords_2, overlap)
         self.assertTrue(comb_mds.shape == (
             mds_coords_1.shape[0] * 2 - overlap, dim))
         self.assertAlmostEqual(comb_mds[0, 0], -3.783335, places=5)
