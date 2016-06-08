@@ -20,6 +20,11 @@ class TestSCMDS(unittest.TestCase):
         distance_matrix = DistanceMatrix(self.test_matrix, [str(id_) for id_ in xrange(self.test_matrix.shape[0])])
         self.scmds.run(distance_matrix)
 
+    def test_scmds_output_dimensions(self):
+        """ Ensure that an incorrect num_dimensions_out parameter triggers an exception """
+        with self.assertRaises(ValueError):
+            self.scmds.run(self.test_matrix, num_dimensions_out=self.test_matrix.shape[0])
+
     def test_scmds_cmds_tzeng(self):
         """cmds_tzeng() should return eigenvectors and eigenvalues,
         sorted by the eigenvalues

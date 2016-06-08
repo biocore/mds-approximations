@@ -26,6 +26,11 @@ class TestNystrom(unittest.TestCase):
         distance_matrix = DistanceMatrix(self.test_matrix, [str(id_) for id_ in xrange(self.test_matrix.shape[0])])
         self.nystrom.run(distance_matrix)
 
+    def test_nystrom_output_dimensions(self):
+        """ Ensure that an incorrect num_dimensions_out parameter triggers an exception """
+        with self.assertRaises(ValueError):
+            self.nystrom.run(self.test_matrix, num_dimensions_out=self.test_matrix.shape[0])
+
     def test_nystrom_build_seed_matrix(self):
         """build_seed_matrix() should return a seedmatrix and an order
         """

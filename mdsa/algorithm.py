@@ -16,7 +16,7 @@ class Algorithm(object):
         Parameters
         ----------
         distance_matrix : skbio.DistanceMatrix
-            scikit-bio distance matrix object
+            scikit-bio distance matrix object, assumed to be of size n x n (symmetric).
         num_dimensions_out : int
             Number of dimensions (i.e. eigenvectors)
             to return, i.e. what dimensionality to approximate given distance matrix to.
@@ -31,7 +31,9 @@ class Algorithm(object):
         percentages: np.array
             Percentage of variation explained per coordinate
         """
-        pass
+        if distance_matrix.shape[0] <= num_dimensions_out:
+            raise ValueError('Cannot run PCoA on distance_matrix with shape %s and num_dimensions_out=%d: '
+                             'nothing to reduce!' % (repr(distance_matrix.shape), num_dimensions_out))
 
     @staticmethod
     def get_algorithm(algorithm_name):

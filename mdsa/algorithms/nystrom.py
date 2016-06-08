@@ -86,6 +86,7 @@ class Nystrom(Algorithm):
         super(Nystrom, self).__init__(algorithm_name='nystrom')
 
     def run(self, distance_matrix, num_dimensions_out=10):
+        super(Nystrom, self).run(distance_matrix, num_dimensions_out)
         distance_matrix = distance_matrix.data
 
         n_seeds = int(log(distance_matrix.shape[0], 2)) ** 2
