@@ -12,10 +12,10 @@ before_install:
   # Update conda itself
   - conda update --yes conda
 install:
-  - conda create --yes -n testaroo python=$PYTHON_VERSION numpy scipy matplotlib pandas scikit-learn scikit-bio ipython cython nose pep8 flake8 pip
-  - if [ ${USE_CYTHON} ]; then conda install --yes -n testaroo cython; fi
-  - source activate testaroo
-  - pip install . --no-deps
+  - conda create --yes --name mdsa python=$PYTHON_VERSION IPython 'matplotlib >= 1.4.3' 'numpy >= 1.9.2' 'pandas >= 0.16.2' 'scipy >= 0.15.1' 'scikit-bio>=0.4.0' 'scikit-learn' click cython nose pep8 flake8 pip
+  - if [ ${USE_CYTHON} ]; then conda install --yes -n mdsa cython; fi
+  - source activate mdsa
+  - pip install .
 script:
   - nosetests
   - flake8 setup.py mdsa
