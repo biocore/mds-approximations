@@ -112,7 +112,7 @@ class Nystrom(Algorithm):
         """
 
         if not seed_distmat.shape[0] < seed_distmat.shape[1]:
-            raise ValueError("seed distance matrix should"
+            raise ValueError("seed distance matrix should "
                              "have less rows than column")
         if not dimensions <= seed_distmat.shape[0]:
             raise ValueError("number of rows of seed matrix must be "
@@ -155,6 +155,8 @@ class Nystrom(Algorithm):
         if PRINT_TIMINGS:
             print("TIMING(%s): Eigendecomposition of A took %f CPU secs" %
                   (__name__, time.clock() - t0))
+
+        # note: for optimization, if nystrom wins out, this is an excellent cython or numba target
         # Sort descending
         ind = argsort(eigval_a)
         ind = ind[::-1]
@@ -212,7 +214,7 @@ class Nystrom(Algorithm):
                        1/m SUM_q E_iq^2 +
                        1/m^2 SUM_q E_pq^2
 
-        Row and colum centering terms (E_pj and E_iq) are identical
+        Row and column centering terms (E_pj and E_iq) are identical
         because we use a k x k submatrix of a symmetrical distance
 
         m equals here ncols or ncols of matrix_e

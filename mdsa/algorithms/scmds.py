@@ -1,3 +1,4 @@
+import numpy as np
 from numpy import concatenate, ndarray, kron
 from numpy import matrix, ones, dot, argsort, diag, eye
 from numpy import sign, sqrt, power, mean, array
@@ -69,8 +70,8 @@ class Scmds(Algorithm):
             curr_tile_size = tile_end - tile_start
 
         eigenvectors = array(self.combine_mds.getFinalMDS())
-        eigenvalues = [float('nan')] * num_dimensions_out
-        percentages = [float('nan')] * num_dimensions_out
+        eigenvalues = np.full(num_dimensions_out, np.nan)
+        percentages = np.full(num_dimensions_out, np.nan)
         return eigenvectors, eigenvalues, percentages
 
     def _cmds_tzeng(self, distmat, dim=None):
