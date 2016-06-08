@@ -103,7 +103,6 @@ class Scmds(Algorithm):
 
         h = eye(n) - ones((n, n)) / n
         assocmat = -h * (power(distmat, 2)) * h / 2
-        # print "DEBUG assocmat[:3] = %s" % assocmat[:3]
 
         (eigvals, eigvecs) = eigh(assocmat)
 
@@ -208,14 +207,6 @@ class CombineMds(object):
         if not len(mat.shape) == 2:
             raise ValueError("argument is not a 2D ndarray")
 
-        # nrows = mat.shape[0]
-        #  create a column vector (hack!)
-        # cv = matrix(arange(float(nrows)))
-        # cv = cv.T
-        #  for i in range(nrows):
-        #     cv[i] = mat[i].mean()
-        #
-        # As pointed out by Daniel the above is much simpler done in Numpy:
         cv = matrix(mean(mat, axis=1).reshape((mat.shape[0], 1)))
 
         return cv
@@ -365,19 +356,10 @@ class CombineMds(object):
         Recentered version of `mds_combined`
         """
 
-        # or should we cast explictely?
+        # or should we cast explicitly?
         if not isinstance(joined_mds, matrix):
             raise ValueError("mds solution has to be of type matrix")
 
-        # As pointed out by Daniel: the following two loop can be done in
-        # one if you pass down the axis variable to means()
-        #
-        # colmean = []
-        # for i in range(joined_mds.shape[1]):
-        #    colmean.append(joined_mds[:, i].mean())
-        # for i in range(joined_mds.shape[0]):
-        #    joined_mds[i, :] = joined_mds[i, :] - colmean
-        #
         joined_mds = joined_mds - joined_mds.mean(axis=0)
 
         matrix_m = dot(joined_mds.transpose(), joined_mds)

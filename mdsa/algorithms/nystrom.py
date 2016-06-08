@@ -100,8 +100,8 @@ class Nystrom(Algorithm):
 
         eigenvectors = self._nystrom(sample_distmtx, num_dimensions_out)
 
-        eigenvalues = [float('nan')] * num_dimensions_out
-        percentages = [float('nan')] * num_dimensions_out
+        eigenvalues = np.full(num_dimensions_out, np.nan)
+        percentages = np.full(num_dimensions_out, np.nan)
         return array(eigenvectors), array(eigenvalues), array(percentages)
 
     def _nystrom(self, seed_distmat, dimensions, PRINT_TIMINGS=False):
@@ -122,20 +122,12 @@ class Nystrom(Algorithm):
         nfull = seed_distmat.shape[1]
 
         # matrix E: extract columns 1--nseed
-        #
         matrix_e = seed_distmat[:, 0:nseeds]
-        # print("INFO: Extracted Matrix E which is of shape %dx%d" %
-        #      (matrix_e.shape))
 
         # matrix F: extract columns nseed+1--end
-        #
         matrix_f = seed_distmat[:, nseeds:]
-        # print("INFO: Extracted Matrix F which is of shape %dx%d" %
-        #      (matrix_f.shape))
 
         # matrix A
-        #
-        # print("INFO: Computing Matrix A")
         t0 = time.clock()
         matrix_a = self._calc_matrix_a(matrix_e)
         if PRINT_TIMINGS:
@@ -143,8 +135,6 @@ class Nystrom(Algorithm):
                   (__name__, time.clock() - t0))
 
         # matrix B
-        #
-        # print("INFO: Computing Matrix B")
         t0 = time.clock()
         matrix_b = self._calc_matrix_b(matrix_e, matrix_f)
         if PRINT_TIMINGS:
@@ -171,7 +161,6 @@ class Nystrom(Algorithm):
         eigval_a = eigval_a[ind]
         eigvec_a = eigvec_a[:, ind]
 
-        # print("INFO: Estimating MDS coords")
         t0 = time.clock()
         result = zeros((nfull, dimensions))  # X in Platt 2005
         # Preventing negative eigenvalues by using abs value. Other option
