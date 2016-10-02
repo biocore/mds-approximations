@@ -87,7 +87,6 @@ class Nystrom(Algorithm):
 
     def run(self, distance_matrix, num_dimensions_out=10):
         super(Nystrom, self).run(distance_matrix, num_dimensions_out)
-        distance_matrix = distance_matrix.data
 
         n_seeds = int(log(distance_matrix.shape[0], 2)) ** 2
         if n_seeds <= num_dimensions_out:
@@ -102,8 +101,7 @@ class Nystrom(Algorithm):
         eigenvectors = self._nystrom(sample_distmtx, num_dimensions_out)
 
         eigenvalues = np.full(num_dimensions_out, np.nan)
-        percentages = np.full(num_dimensions_out, np.nan)
-        return array(eigenvectors), array(eigenvalues), array(percentages)
+        return array(eigenvectors), array(eigenvalues)
 
     def _nystrom(self, seed_distmat, dimensions, PRINT_TIMINGS=False):
         """Computes an approximate MDS mapping of an (unknown) full distance

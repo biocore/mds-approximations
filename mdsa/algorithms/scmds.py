@@ -33,7 +33,6 @@ class Scmds(Algorithm):
 
     def run(self, distance_matrix, num_dimensions_out=10):
         super(Scmds, self).run(distance_matrix, num_dimensions_out)
-        distance_matrix = distance_matrix.data
 
         num_objects = distance_matrix.shape[0]
         tile_size = int(num_objects * 0.6)
@@ -72,8 +71,7 @@ class Scmds(Algorithm):
 
         eigenvectors = array(self.combine_mds.getFinalMDS())
         eigenvalues = np.full(num_dimensions_out, np.nan)
-        percentages = np.full(num_dimensions_out, np.nan)
-        return eigenvectors, eigenvalues, percentages
+        return eigenvectors, eigenvalues
 
     def _cmds_tzeng(self, distmat, dim=None):
         """Calculate classical multidimensional scaling on a distance matrix.

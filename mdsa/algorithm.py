@@ -1,5 +1,7 @@
 from abc import abstractmethod
 
+import numpy as np
+
 
 class Algorithm(object):
     algorithms = {}
@@ -33,9 +35,13 @@ class Algorithm(object):
             Eigenvalues corresponding to the rows, indicating the amount of
             the variation that
             the axis in that row accounts for
-        percentages: np.array
-            Percentage of variation explained per coordinate
         """
+        if not isinstance(distance_matrix, np.ndarray):
+            raise ValueError('distance_matrix must be numpy array in which the'
+                             ' values have been prepared for PCoA '
+                             '(centered, etc.). '
+                             'Did you try to pass scikit-bio DistanceMatrix?')
+
         if distance_matrix.shape[0] <= num_dimensions_out:
             raise ValueError(
                 'Cannot run PCoA on distance_matrix with shape %s and '

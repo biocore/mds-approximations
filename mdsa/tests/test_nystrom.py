@@ -2,7 +2,6 @@ import unittest
 
 import numpy as np
 from numpy import random, argsort
-from skbio import DistanceMatrix
 from skbio.util import get_data_path
 
 from mdsa import goodness_of_fit
@@ -23,11 +22,7 @@ class TestNystrom(unittest.TestCase):
         self.small_seed_matrix = self.test_matrix[:25]
 
     def test_nystrom(self):
-        # wrap self.test_matrix in an skbio distance matrix
-        distance_matrix = DistanceMatrix(self.test_matrix,
-                                         [str(id_) for id_ in
-                                          xrange(self.test_matrix.shape[0])])
-        self.nystrom.run(distance_matrix)
+        self.nystrom.run(self.test_matrix)
 
     def test_nystrom_output_dimensions(self):
         """ Ensure that an incorrect num_dimensions_out parameter triggers

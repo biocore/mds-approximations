@@ -12,6 +12,8 @@ from mdsa.algorithms.nystrom import Nystrom
 from mdsa.algorithms.scmds import Scmds
 
 # Register algorithms here
+from mdsa.pcoa import pcoa
+
 Algorithm.register(Nystrom())
 Algorithm.register(Scmds())
 
@@ -95,22 +97,17 @@ def run(inputfile, outpath, algorithms, dimensions):
                        % algorithm_name, err=True)
             return
 
-        eigenvectors, eigenvalues, percentages = \
-            algorithm.run(input_matrix, num_dimensions_out=dimensions)
+        # Run PCoA
+        ordination_results = pcoa(input_matrix, algorithm, dimensions)
 
-        formatted_pcoa_output = format_pcoa_output(eigenvectors, eigenvalues,
-                                                   percentages)
-
+        # Output results to file
         outfile_full_path = os.path.join(outpath, algorithm_name + '.txt')
 
         if not os.path.exists(outpath):
             os.makedirs(outpath)
 
         click.echo('Outputting results to file: %s\n' % outfile_full_path)
-        with open(outfile_full_path, 'w') as out:
-            out.write(formatted_pcoa_output)
-            out.write('\n')
-            out.flush()
+        ordination_results.write(outfile_full_path)
 
 
 def format_pcoa_output(eigenvectors, eigenvalues, percentages):
