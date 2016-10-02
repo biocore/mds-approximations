@@ -12,10 +12,12 @@ from mdsa.algorithms.nystrom import Nystrom
 from mdsa.algorithms.scmds import Scmds
 
 # Register algorithms here
+from mdsa.algorithms.svd import SVD
 from mdsa.pcoa import pcoa
 
 Algorithm.register(Nystrom())
 Algorithm.register(Scmds())
+Algorithm.register(SVD())
 
 
 @click.group()
