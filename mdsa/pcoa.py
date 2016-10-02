@@ -95,7 +95,8 @@ def pcoa(distance_matrix, algorithm, num_dimensions_out=10):
     eigenvectors, eigenvalues = algorithm.run(F_matrix, num_dimensions_out)
 
     # Ensure eigenvectors are normalized
-    eigenvectors = [vec / np.linalg.norm(vec) for vec in eigenvectors]
+    eigenvectors = np.array([vec / np.linalg.norm(vec)
+                             for vec in eigenvectors])
 
     # Generate axis labels for output
     axis_labels = ['PC%d' % i for i in range(1, len(eigenvectors) + 1)]
@@ -172,9 +173,12 @@ def pcoa(distance_matrix, algorithm, num_dimensions_out=10):
         # Only select k (num_dimensions_out) first eigenvectors
         # and their corresponding eigenvalues from the sorted array
         # of eigenvectors / eigenvalues
-        if len(eigenvectors) > num_dimensions_out:
-            eigenvectors = eigenvectors[:num_dimensions_out]
+
+        if len(eigenvalues) > num_dimensions_out:
+            eigenvectors = eigenvectors[:, :num_dimensions_out]
             eigenvalues = eigenvalues[:num_dimensions_out]
+
+        axis_labels = axis_labels[:num_dimensions_out]
 
         # Calculate the array of proportion of variance explained
         proportion_explained = eigenvalues / eigenvalues.sum()
@@ -183,7 +187,8 @@ def pcoa(distance_matrix, algorithm, num_dimensions_out=10):
             short_method_name='PCoA',
             long_method_name='Principal Coordinate Analysis',
             eigvals=pd.Series(eigenvalues, index=axis_labels),
-            samples=pd.DataFrame(eigenvectors, index=distance_matrix.ids,
+            samples=pd.DataFrame(eigenvectors,
+                                 index=distance_matrix.ids,
                                  columns=axis_labels),
             proportion_explained=pd.Series(proportion_explained,
                                            index=axis_labels))
