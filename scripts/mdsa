@@ -8,6 +8,7 @@ import numpy as np
 from skbio import DistanceMatrix
 
 from mdsa.algorithm import Algorithm
+from mdsa.algorithms.fsvd import FSVD
 from mdsa.algorithms.nystrom import Nystrom
 from mdsa.algorithms.scmds import Scmds
 
@@ -18,6 +19,7 @@ from mdsa.pcoa import pcoa
 Algorithm.register(Nystrom())
 Algorithm.register(Scmds())
 Algorithm.register(SVD())
+Algorithm.register(FSVD())
 
 
 @click.group()
