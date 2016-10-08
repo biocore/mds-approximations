@@ -16,6 +16,9 @@ install:
   - if [ ${USE_CYTHON} ]; then conda install --yes -n mdsa cython; fi
   - source activate mdsa
   - pip install .
+  - pip install coveralls
 script:
-  - nosetests
+  - nosetests --with-coverage --cover-package=mdsa
   - flake8 setup.py mdsa
+after_success:
+  - coveralls
