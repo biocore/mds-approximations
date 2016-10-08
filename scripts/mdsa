@@ -13,6 +13,7 @@ from mdsa.algorithms.eigsh import Eigsh
 from mdsa.algorithms.fsvd import FSVD
 from mdsa.algorithms.nystrom import Nystrom
 from mdsa.algorithms.scmds import Scmds
+from mdsa.algorithms.ssvd import SSVD
 
 from mdsa.algorithms.svd import SVD
 from mdsa.pcoa import pcoa
@@ -22,6 +23,7 @@ from mdsa.pcoa import pcoa
 Algorithm.register(Nystrom())
 Algorithm.register(Scmds())
 Algorithm.register(SVD())
+Algorithm.register(SSVD())
 Algorithm.register(FSVD())
 Algorithm.register(Eigsh())
 Algorithm.register(Eigh())
