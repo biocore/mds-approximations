@@ -104,6 +104,7 @@ def pcoa(distance_matrix, algorithm, num_dimensions_out=10):
 
     # Generate axis labels for output
     axis_labels = ['PC%d' % i for i in range(1, len(eigenvectors) + 1)]
+    axis_labels = axis_labels[:num_dimensions_out]
 
     # Some algorithms do not return eigenvalues. Thus, we cannot compute
     # the array of proportion of variance explained and we cannot sort the
@@ -181,8 +182,6 @@ def pcoa(distance_matrix, algorithm, num_dimensions_out=10):
         if len(eigenvalues) > num_dimensions_out:
             eigenvectors = eigenvectors[:, :num_dimensions_out]
             eigenvalues = eigenvalues[:num_dimensions_out]
-
-        axis_labels = axis_labels[:num_dimensions_out]
 
         # Calculate the array of proportion of variance explained
         proportion_explained = eigenvalues / eigenvalues.sum()
