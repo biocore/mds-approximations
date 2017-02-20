@@ -113,17 +113,21 @@ def pcoa(distance_matrix, algorithm, num_dimensions_out=10):
         # Only return an OrdinationResults object wrapping the result's
         # eigenvectors. Leave the eigenvalues as NaNs.
 
-        # TODO: Nystrom and SCMDS do not return
-        # num_dimensions_out number of eigenvectors
-        # Figure out if we need to throw away eigenvectors here
-        # or if that's the intended behavior.
+        # Since there are no eigenvalues, we cannot compute proportions
+        # explained. However, we cannot simply omit the proportions explained
+        # array, since other scripts may be expecting it
+        # when reading an OrdinationResults object.
+        # So instead, return array of NaNs.
+        proportion_explained = np.full(num_dimensions_out, np.nan)
 
         return OrdinationResults(
             short_method_name='PCoA',
             long_method_name='Principal Coordinate Analysis',
             samples=pd.DataFrame(eigenvectors, index=distance_matrix.ids,
                                  columns=axis_labels),
-            eigvals=pd.Series(eigenvalues))
+            eigvals=pd.Series(eigenvalues),
+            proportion_explained=pd.Series(proportion_explained,
+                                           index=axis_labels))
     else:
         # cogent makes eigenvalues positive by taking the
         # abs value, but that doesn't seem to be an approach accepted
