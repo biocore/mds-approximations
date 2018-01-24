@@ -1,6 +1,8 @@
+import numpy as np
 from numpy import dot, hstack
 from numpy.linalg import qr, svd
 from numpy.random import standard_normal
+
 from mdsa.algorithm import Algorithm
 
 
@@ -48,20 +50,29 @@ class FSVD(Algorithm):
 
         m, n = distance_matrix.shape
 
+        # Note: this transpose is removed for performance, since we
+        # only expect square matrices.
         # Take (conjugate) transpose if necessary, because it makes H smaller,
         # leading to faster computations
-        if m < n:
-            distance_matrix = distance_matrix.transpose()
-            m, n = distance_matrix.shape
+        # if m < n:
+        #     distance_matrix = distance_matrix.transpose()
+        #     m, n = distance_matrix.shape
+        if m != n:
+            raise ValueError('FSVD.run(...) expects square distance matrix')
+
+        # centering step, added by Daniel McDonald,
+        # as per notes in Legendre & Legendre
+        distance_matrix = f_matrix_optimized(
+            e_matrix_optimized(distance_matrix))
 
         # Transpose
-        l = num_dimensions_out + 2
+        k = num_dimensions_out + 2
 
         # Form a real nxl matrix G whose entries are independent,
         # identically distributed
-        # Gaussian random varaibles of
+        # Gaussian random variables of
         # zero mean and unit variance
-        G = standard_normal(size=(n, l))
+        G = standard_normal(size=(n, k))
 
         if use_power_method:
             # use only the given exponent
@@ -69,19 +80,26 @@ class FSVD(Algorithm):
 
             for x in xrange(2, num_levels + 2):
                 # enhance decay of singular values
-                H = dot(distance_matrix, dot(distance_matrix.transpose(), H))
+                # note: distance_matrix is no longer transposed, saves work
+                # since we're expecting symmetric, square matrices anyway
+                # (Daniel McDonald's changes)
+                H = dot(distance_matrix, dot(distance_matrix, H))
 
         else:
             # compute the m x l matrices H^{(0)}, ..., H^{(i)}
             # Note that this is done implicitly in each iteration below.
             H = dot(distance_matrix, G)
+            # Again, removed transpose: dot(distance_matrix.transpose(), H)
+            # to enhance performance
             H = hstack(
-                (H, dot(distance_matrix, dot(distance_matrix.transpose(), H))))
+                (H, dot(distance_matrix, dot(distance_matrix, H))))
             for x in xrange(3, num_levels + 2):
-                tmp = dot(distance_matrix, dot(distance_matrix.transpose(), H))
+                # Removed this transpose: dot(distance_matrix.transpose(), H)
+                tmp = dot(distance_matrix, dot(distance_matrix, H))
+
+                # Removed this transpose: dot(distance_matrix.transpose(), tmp)
                 H = hstack(
-                    (H, dot(distance_matrix,
-                            dot(distance_matrix.transpose(), tmp))))
+                    (H, dot(distance_matrix, dot(distance_matrix, tmp))))
 
         # Using the pivoted QR-decomposiion, form a real m * ((i+1)l) matrix Q
         # whose columns are orthonormal, s.t. there exists a real
@@ -89,7 +107,8 @@ class FSVD(Algorithm):
         Q, R = qr(H)
 
         # Compute the n * ((i+1)l) product matrix T = A^T Q
-        T = dot(distance_matrix.transpose(), Q)  # step 3
+        # Removed transpose of distance_matrix for performance
+        T = dot(distance_matrix, Q)  # step 3
 
         # Form an SVD of T
         Vt, St, W = svd(T, full_matrices=False)
@@ -112,3 +131,50 @@ class FSVD(Algorithm):
         eigenvectors = U_fsvd.real
 
         return eigenvectors, eigenvalues
+
+
+# Daniel McDonald note:
+# e and f matrix modifications validated via procrustes against pcoa using
+# ~600 samples (studies 10105 and 10564). procusted was like m^2 of 0.000
+# using these
+# rewrites and the originals from skbio
+def e_matrix_optimized(distance_matrix):
+    """
+    Compute E matrix from a distance matrix.
+    Squares and divides by -2 the input elementwise. Eq. 9.20 in
+    Legendre & Legendre 1998.
+    """
+
+    # modified from skbio, performing row-wise to avoid excessive memory
+    # allocations
+    for i in np.arange(len(distance_matrix)):
+        distance_matrix[i] = (distance_matrix[i] * distance_matrix[i]) / -2
+    return distance_matrix
+
+
+def f_matrix_optimized(E_matrix):
+    """Compute F matrix from E matrix.
+    Centring step: for each element, the mean of the corresponding
+    row and column are substracted, and the mean of the whole
+    matrix is added. Eq. 9.21 in Legendre & Legendre 1998."""
+
+    # modified from skbio, performing rowwise to avoid excessive memory
+    # allocations
+    row_means = np.zeros(len(E_matrix), dtype=float)
+    col_means = np.zeros(len(E_matrix), dtype=float)
+    matrix_mean = 0.0
+
+    for i in np.arange(len(E_matrix)):
+        row_means[i] = E_matrix[i].mean()
+        matrix_mean += E_matrix[i].sum()
+        col_means += E_matrix[i]
+    matrix_mean /= len(E_matrix) ** 2
+    col_means /= len(E_matrix)
+
+    for i in np.arange(len(E_matrix)):
+        v = E_matrix[i]
+        v -= row_means[i]
+        v -= col_means
+        v += matrix_mean
+        E_matrix[i] = v
+    return E_matrix
