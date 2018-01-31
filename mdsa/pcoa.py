@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 from skbio import OrdinationResults
 from skbio.stats.distance import DistanceMatrix
-from skbio.stats.ordination._utils import e_matrix, f_matrix
 
 
 # - In cogent, after computing eigenvalues/vectors, the imaginary part
@@ -14,6 +13,7 @@ from skbio.stats.ordination._utils import e_matrix, f_matrix
 #   http://math.stackexchange.com/a/47807/109129 for details) and in
 #   that case dropping the imaginary part means they'd no longer be
 #   so, so I'm not doing that.
+from centering import center_distance_matrix
 from mdsa.algorithm import Algorithm
 
 
@@ -34,6 +34,10 @@ def pcoa(distance_matrix, algorithm, num_dimensions_out=10):
     the other, or too low in both, etc. On the other hand, if an
     species is present in two sites, that means that the sites are
     similar.).
+
+    Note: the incoming distance matrix is centered before being passed to the
+    specified PCoA algorithm.
+
     Parameters
     ----------
     algorithm : Algorithm
@@ -75,24 +79,12 @@ def pcoa(distance_matrix, algorithm, num_dimensions_out=10):
     if not isinstance(distance_matrix, DistanceMatrix):
         distance_matrix = DistanceMatrix(distance_matrix)
 
-    # Implemented as per algorithm outlined in
-    # Numerical Ecology (Legendre & Legendre 1998)
-    # See Chapter 9, Equation 9.20
-    E_matrix = e_matrix(distance_matrix.data)
-
-    # FYI: If the used distance was euclidean, pairwise distances
-    # needn't be computed from the data table Y because F_matrix =
-    # Y.dot(Y.T) (if Y has been centred).
-    # But since we're expecting distance_matrix to be non-euclidian,
-    # we do the following computation as per
-    # Numerical Ecology (Legendre & Legendre 1998)
-    # See Chapter 9, Equation 9.21
-    # ... which centers the matrix (a requirement for PcoA)
-    F_matrix = f_matrix(E_matrix)
+    # Center distance matrix, a requirement for PCoA here
+    centered_dm = center_distance_matrix(distance_matrix.data)
 
     # Run the given algorithm that decomposes the matrix into eigenvectors
     # and eigenvalues.
-    eigenvectors, eigenvalues = algorithm.run(F_matrix, num_dimensions_out)
+    eigenvectors, eigenvalues = algorithm.run(centered_dm, num_dimensions_out)
 
     # Coerce to numpy array just in case
     eigenvectors = np.array(eigenvectors)
