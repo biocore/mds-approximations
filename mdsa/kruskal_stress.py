@@ -1,5 +1,6 @@
 #!usr/bin/env python
-"""Goodness of fit of Multidimensional Scaling
+"""
+Kruskal Stress Goodness of fit of Multidimensional Scaling
 
 Implements several functions that measure the degree of correspondence
 between an MDS and its coordinates and the original input distances.
@@ -13,7 +14,7 @@ Statistical Analysis
 import numpy
 
 
-class Stress(object):
+class KruskalStress(object):
     """Degree of correspondence between input distances and an MDS
 
     Stress measures the goodness of fit or degree of correspondence
@@ -69,7 +70,7 @@ class Stress(object):
         # compute distances implied by MDS and scale if requested (and
         # necessary) by the ratio of maxima of both matrices
         #
-        self._reproduced_distmat = self._calc_pwdist(mds_coords)
+        self._reproduced_distmat = self._calc_pairwise_dist(mds_coords)
         if apply_scaling:
             max_orig = self._orig_distmat.max()
             max_derived = self._reproduced_distmat.max()
@@ -77,7 +78,7 @@ class Stress(object):
             if scale != 1.0:
                 self._reproduced_distmat = self._reproduced_distmat / scale
 
-    def calcKruskalStress(self):
+    def calc_kruskal_stress(self):
         """Calculate Kruskal's Stress AKA Stress-1
 
         Kruskal's Stress or Stress-1 is defined as:
@@ -123,7 +124,7 @@ class Stress(object):
 
         return result
 
-    def calcSstress(self):
+    def calc_s_stress(self):
         """Calculate SStress
 
         SStress (Takane, 1977) is defined as
@@ -164,7 +165,7 @@ class Stress(object):
         return result
 
     @staticmethod
-    def _calc_rowdist(row1, row2):
+    def _calc_row_dist(row1, row2):
         """Calculate the euclidean distance between two row vectors.
 
         NOTE: This function will be called quite often. To safe some
@@ -185,7 +186,7 @@ class Stress(object):
         result = numpy.sqrt(row_diffsq.sum())
         return result
 
-    def _calc_pwdist(self, mds_coords):
+    def _calc_pairwise_dist(self, mds_coords):
         """Compute a full symmetric distance matrix from MDS coordinates
 
         Calculate pairwise distances between m original distances
@@ -209,6 +210,6 @@ class Stress(object):
         for i in range(mds_coords.shape[0]):
             row_i = mds_coords[i, :]
             for j in range(i + 1, mds_coords.shape[0]):
-                result[i, j] = self._calc_rowdist(row_i, mds_coords[j, :])
+                result[i, j] = self._calc_row_dist(row_i, mds_coords[j, :])
                 result[j, i] = result[i, j]
         return result

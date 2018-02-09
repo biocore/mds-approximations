@@ -4,7 +4,8 @@
 import unittest
 
 import numpy
-import mdsa.goodness_of_fit as goodness_of_fit
+
+from mdsa import kruskal_stress
 
 
 def example_distmat_and_mdscoords():
@@ -18,63 +19,64 @@ def example_distmat_and_mdscoords():
     ** MDS coordinates as numpy.array
     """
     distmat = numpy.array([
-        [0.,  0.039806,  0.056853,  0.21595,  0.056853,  0.0138,
-         0.203862,  0.219002,  0.056853,  0.064283],
-        [0.039806,  0.,  0.025505,  0.203862,  0.0208,  0.039806,
-         0.194917,  0.21291,  0.0208,  0.027869],
-        [0.056853,  0.025505,  0.,  0.197887,  0.018459,  0.056853,
-         0.191958,  0.203862,  0.018459,  0.025505],
-        [0.21595,  0.203862,  0.197887,  0.,  0.206866,  0.206866,
-         0.07956,  0.066935,  0.203862,  0.206866],
-        [0.056853,  0.0208,  0.018459,  0.206866,  0.,  0.056853,
-         0.203862,  0.21595,  0.0138,  0.0208],
-        [0.0138,  0.039806,  0.056853,  0.206866,  0.056853,  0.,
-         0.197887,  0.209882,  0.056853,  0.064283],
-        [0.203862,  0.194917,  0.191958,  0.07956,  0.203862,  0.197887,
-         0.,  0.030311,  0.200869,  0.206866],
-        [0.219002,  0.21291,  0.203862,  0.066935,  0.21595,  0.209882,
-         0.030311,  0.,  0.21291,  0.219002],
-        [0.056853,  0.0208,  0.018459,  0.203862,  0.0138,  0.056853,
-         0.200869,  0.21291,  0.,  0.011481],
-        [0.064283,  0.027869,  0.025505,  0.206866,  0.0208,  0.064283,
-         0.206866,  0.219002,  0.011481,  0.]])
+        [0., 0.039806, 0.056853, 0.21595, 0.056853, 0.0138,
+         0.203862, 0.219002, 0.056853, 0.064283],
+        [0.039806, 0., 0.025505, 0.203862, 0.0208, 0.039806,
+         0.194917, 0.21291, 0.0208, 0.027869],
+        [0.056853, 0.025505, 0., 0.197887, 0.018459, 0.056853,
+         0.191958, 0.203862, 0.018459, 0.025505],
+        [0.21595, 0.203862, 0.197887, 0., 0.206866, 0.206866,
+         0.07956, 0.066935, 0.203862, 0.206866],
+        [0.056853, 0.0208, 0.018459, 0.206866, 0., 0.056853,
+         0.203862, 0.21595, 0.0138, 0.0208],
+        [0.0138, 0.039806, 0.056853, 0.206866, 0.056853, 0.,
+         0.197887, 0.209882, 0.056853, 0.064283],
+        [0.203862, 0.194917, 0.191958, 0.07956, 0.203862, 0.197887,
+         0., 0.030311, 0.200869, 0.206866],
+        [0.219002, 0.21291, 0.203862, 0.066935, 0.21595, 0.209882,
+         0.030311, 0., 0.21291, 0.219002],
+        [0.056853, 0.0208, 0.018459, 0.203862, 0.0138, 0.056853,
+         0.200869, 0.21291, 0., 0.011481],
+        [0.064283, 0.027869, 0.025505, 0.206866, 0.0208, 0.064283,
+         0.206866, 0.219002, 0.011481, 0.]])
 
     mds_coords = numpy.array([
-        [0.065233,  0.035019,  0.015413],
-        [0.059604,  0.00168, -0.003254],
+        [0.065233, 0.035019, 0.015413],
+        [0.059604, 0.00168, -0.003254],
         [0.052371, -0.010959, -0.014047],
-        [-0.13804, -0.036031,  0.031628],
+        [-0.13804, -0.036031, 0.031628],
         [0.063703, -0.015483, -0.00751],
-        [0.056803,  0.031762,  0.021767],
-        [-0.135082,  0.023552, -0.021006],
-        [-0.150323,  0.011935, -0.010013],
+        [0.056803, 0.031762, 0.021767],
+        [-0.135082, 0.023552, -0.021006],
+        [-0.150323, 0.011935, -0.010013],
         [0.06072, -0.01622, -0.007721],
         [0.065009, -0.025254, -0.005257]])
 
-    return (distmat, mds_coords)
+    return distmat, mds_coords
 
 
-class GoodnessOfFitTestCase(unittest.TestCase):
+class KruskalStressTestCase(unittest.TestCase):
 
     def setUp(self):
         """
         set up
         """
         (self.distmat, self.mds_coords) = example_distmat_and_mdscoords()
-        self.stress = goodness_of_fit.Stress(self.distmat, self.mds_coords)
+        self.stress = kruskal_stress.KruskalStress(self.distmat,
+                                                   self.mds_coords)
 
     def test_kruskalstress1(self):
         """
         testing goodness_of_fit.calcKruskalStress()
         """
-        val = "%0.6f" % self.stress.calcKruskalStress()
+        val = "%0.6f" % self.stress.calc_kruskal_stress()
         self.assertEqual(val, '0.022555')
 
     def test_sstress(self):
         """
         testing goodness_of_fit.calcSstress()
         """
-        val = "%0.6f" % self.stress.calcSstress()
+        val = "%0.6f" % self.stress.calc_s_stress()
         self.assertEqual(val, '0.008832')
 
     def test_calc_pwdist(self):
@@ -85,11 +87,11 @@ class GoodnessOfFitTestCase(unittest.TestCase):
         # this is a square in 2D
         square_mds = numpy.array([[0, 0], [1, 0], [1, 1], [0, 1]])
         # this is what the distance matrix should look like
-        square_distmat = numpy.array([[0.,  1.,  1.41421356,  1.],
-                                      [1.,  0.,  1.,  1.41421356],
-                                      [1.41421356,  1.,  0.,  1.],
-                                      [1.,  1.41421356,  1.,  0.]])
-        derived_distmat = self.stress._calc_pwdist(square_mds)
+        square_distmat = numpy.array([[0., 1., 1.41421356, 1.],
+                                      [1., 0., 1., 1.41421356],
+                                      [1.41421356, 1., 0., 1.],
+                                      [1., 1.41421356, 1., 0.]])
+        derived_distmat = self.stress._calc_pairwise_dist(square_mds)
         # check if dervied and original array are (more or less) the same
         self.assert_((derived_distmat - square_distmat).sum() < 0.000001)
 
@@ -98,7 +100,7 @@ class GoodnessOfFitTestCase(unittest.TestCase):
         test if mds_coords and distmat are mix-up is detected
         """
         self.assertRaises(AssertionError,
-                          goodness_of_fit.Stress,
+                          kruskal_stress.KruskalStress,
                           self.mds_coords, self.distmat)
         # should give something like
         # AssertionError: orig_distmat shape bigger than mds_coords shape.
@@ -109,7 +111,7 @@ class GoodnessOfFitTestCase(unittest.TestCase):
         test if check on number of rows works
         """
         self.assertRaises(AssertionError,
-                          goodness_of_fit.Stress,
+                          kruskal_stress.KruskalStress,
                           self.distmat, self.mds_coords.transpose())
         # should give something like
         # AssertionError: orig_distmat and mds_coords do not have the same

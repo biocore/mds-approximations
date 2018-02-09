@@ -4,7 +4,7 @@ import numpy as np
 from numpy import random, argsort
 from skbio.util import get_data_path
 
-from mdsa import goodness_of_fit
+from mdsa import kruskal_stress
 from mdsa.algorithms.nystrom import Nystrom
 
 PRINT_STRESS = False
@@ -95,8 +95,8 @@ class TestNystrom(unittest.TestCase):
 
         dim = 3
         mds_coords = self.nystrom._nystrom(self.big_seed_matrix, dim)
-        stress = goodness_of_fit.Stress(self.test_matrix, mds_coords)
-        kruskal_stress_big_mat = stress.calcKruskalStress()
+        stress = kruskal_stress.KruskalStress(self.test_matrix, mds_coords)
+        kruskal_stress_big_mat = stress.calc_kruskal_stress()
         if PRINT_STRESS:
             print("INFO: Kruskal stress for Nystrom MDS "
                   "(big_seed_matrix, dim=%d) = %f" %
@@ -104,8 +104,8 @@ class TestNystrom(unittest.TestCase):
         self.assertTrue(kruskal_stress_big_mat < 0.04)
 
         mds_coords = self.nystrom._nystrom(self.small_seed_matrix, dim)
-        stress = goodness_of_fit.Stress(self.test_matrix, mds_coords)
-        kruskal_stress_small_mat = stress.calcKruskalStress()
+        stress = kruskal_stress.KruskalStress(self.test_matrix, mds_coords)
+        kruskal_stress_small_mat = stress.calc_kruskal_stress()
         if PRINT_STRESS:
             print("INFO: Kruskal stress for Nystrom MDS "
                   "(small_seed_matrix, dim=%d) = %f" %
