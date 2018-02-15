@@ -20,9 +20,16 @@ class Eigsh(Algorithm):
         distance_matrix = np.array(distance_matrix)
 
         try:
+            # Perform eigendecomposition in eigsh shift-inter mode ('LM' -
+            # largest magnitude eigenvalue finder near sigma=0)
+            # to avoid no convergence that sometimes occurs for large randomly
+            # generated distance matrices using the 'SM' finder mode
+            # (smallest magnitude eigenvalue finder)
             eigenvalues, eigenvectors = eigsh(distance_matrix,
                                               k=num_dimensions_out,
-                                              return_eigenvectors=True)
+                                              return_eigenvectors=True,
+                                              sigma=0,
+                                              which='LM')
         except ArpackNoConvergence as e:
             warn('eigsh unable to converge, only returning {} currently '
                  'converged eigenvectors and {} eigenvalues:\n {}\n\n'
