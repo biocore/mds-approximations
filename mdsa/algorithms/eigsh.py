@@ -60,14 +60,14 @@ class Eigsh(Algorithm):
         eigenvectors = np.array(eigenvectors)
 
         # impute missing eigenvectors, composed of NaN entries
-        nan_eigenvecs = np.array([[np.nan] * eigenvectors.shape[1]]
-                                 * (expected_num_results
-                                    - len(eigenvectors)))
+        nan_eigenvecs = np.array([[np.nan] * eigenvectors.shape[1]] *
+                                 (expected_num_results -
+                                  len(eigenvectors)))
         eigenvectors = np.concatenate((eigenvectors, nan_eigenvecs),
                                       axis=0)
 
         # impute missing eigenvalues as NaNs
-        nan_eigenvals = [[np.nan] * (expected_num_results
-                                     - len(eigenvalues))]
+        nan_eigenvals = [[np.nan] * (expected_num_results -
+                                     len(eigenvalues))]
         eigenvalues = np.append(eigenvalues, nan_eigenvals)
         return eigenvectors, eigenvalues
