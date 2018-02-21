@@ -1,0 +1,82 @@
+#!/usr/bin/env python
+import json
+import os
+
+import click
+from skbio import OrdinationResults
+
+from mdsa.procrustes import procrustes, procrustes_monte_carlo, calc_p_value
+
+
+def validate_trials(ctx, param, value):
+    if value < 10 and value != 0:
+        raise click.BadParameter('trials needs to be either 0 or at least 10')
+    return value
+
+
+@click.command()
+@click.argument('inputfile', type=click.File('r'))
+@click.option('--reference', type=click.File('r'),
+              help='Reference matrix to compare inputfile matrix '
+                   'to during procrustes analysis')
+@click.option('--trials', type=int, default=0, callback=validate_trials,
+              help='Number of random permutations of inputfile matrix to '
+                   'perform')
+@click.option('--outpath', type=click.Path(),
+              help='File path to output procrustes analysis results to (M^2 '
+                   'results of monte carlo simulation.')
+def main(inputfile, reference, trials, outpath):
+    """
+    "Runs procrustes analysis on two coordinate matrices (e.g. the output of
+    PCoA):
+    minimizes distances between corresponding points.
+
+    The inputfile matrix provided is treated as the coordinate matrix to be
+    transformed
+    to minimize distances to the reference points provided in the parameter
+    --reference.
+
+    Monte Carlo simulations can also be performed (optional) through parameter
+    --trials to estimate probability of seeing an M^2 value as extreme as
+    the actual M^2. By default, no such monte carlo analysis is performed.
+
+    """
+    click.echo('Running procrustes analysis on {}'.format(inputfile.name))
+
+    input_matrix = OrdinationResults.read(inputfile.name)
+    reference_matrix = OrdinationResults.read(reference.name)
+
+    pval = -1
+    m_squared_trials = []
+
+    if trials == 0:
+        # do not run monte carlo
+        click.echo('> Performing procrustes with {} trials'.format(trials))
+        m_squared_actual = procrustes(reference_matrix, input_matrix)
+    else:
+        click.echo('> Performing monte-carlo procrustes')
+        m_squared_actual, m_squared_trials, count_better = \
+            procrustes_monte_carlo(reference_matrix,
+                                   input_matrix,
+                                   trials)
+
+        pval = calc_p_value(trials, count_better)
+
+    # Output results to file
+    click.echo('> Outputting procrustes results to: {}'.format(outpath))
+    if not os.path.exists(os.path.dirname(outpath)):
+        dirname = os.path.dirname(outpath)
+        if len(dirname) > 0:
+            os.makedirs(dirname)
+
+    results = {
+        'm_squared_original': m_squared_actual,
+        'montecarlo_p_value': pval,
+        'montecarlo_m_squared_trials': m_squared_trials
+    }
+
+    json.dump(results, open(outpath, 'w'))
+
+
+if __name__ == '__main__':
+    main()
