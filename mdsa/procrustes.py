@@ -203,15 +203,17 @@ def _reorder_rows(matrix, sample_ids, order):
     the results. All sample ids in order however must be in
     sample_ids.
     """
+    if not set(order).issubset(set(sample_ids)):
+        raise ValueError(
+            'Procrustes row reordering encountered sample ID(s) '
+            ' contained in order list not present in matrix.')
+
+    # Optimization: hashmap to avoid repeated O(n) lookup in later for loop
+    lookup = {sample_id: idx for idx, sample_id in enumerate(sample_ids)}
+
     result = []
     for sample_id in order:
-        try:
-            result.append(matrix[sample_ids.index(sample_id)])
-
-        except Exception:
-            raise ValueError(
-                'Procrustes row reordering encountered sample ID in matrix '
-                'not present in given, desired ordering: %s' % sample_id)
+        result.append(matrix[lookup[sample_id]])
 
     return np.array(result)
 
