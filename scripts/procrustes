@@ -27,9 +27,8 @@ def validate_trials(ctx, param, value):
                    'results of monte carlo simulation.')
 def main(inputfile, reference, trials, outpath):
     """
-    "Runs procrustes analysis on two coordinate matrices (e.g. the output of
-    PCoA):
-    minimizes distances between corresponding points.
+    Runs procrustes analysis on two coordinate matrices (e.g. the output of
+    PCoA): minimizes distances between corresponding points.
 
     The inputfile matrix provided is treated as the coordinate matrix to be
     transformed
@@ -39,7 +38,6 @@ def main(inputfile, reference, trials, outpath):
     Monte Carlo simulations can also be performed (optional) through parameter
     --trials to estimate probability of seeing an M^2 value as extreme as
     the actual M^2. By default, no such monte carlo analysis is performed.
-
     """
     click.echo('Running procrustes analysis on {}'.format(inputfile.name))
 

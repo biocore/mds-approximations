@@ -41,8 +41,6 @@ setup(name='mdsa',
       description="Multi-dimensional scaling approximations",
       long_description="Benchmarking several multi-dimensional scaling "
                        "approximation methods",
-      author="Hannes Holste and Knight Lab",
-      maintainer="Hannes Holste",
       url='http://github.com/biocore/mds-approximations/',
       test_suite='nose.collector',
       packages=find_packages(),
