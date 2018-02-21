@@ -5,12 +5,38 @@ from scipy.spatial import procrustes as scipy_procrustes
 from skbio import OrdinationResults
 
 """
-Refactored, updated for skbio 0.5.1 API & optimized by Hannes Holste. 
-Based on original work by Daniel McDonald. 
+Refactored, updated for skbio 0.5.1 API & optimized by Hannes Holste.
+
+Based on contributions to QIIME1 by Greg Caporaso, Justin Kuczynski,
+Jose Carlos Clemente Litran, Jose Antonio Navas Molina.
 """
 
 
-def procrustes(reference_matrix, input_matrix):
+def procrustes_monte_carlo(reference_matrix,
+                           input_matrix,
+                           trials=1000):
+    # Calculate m^2 for original matrices
+    m_squared_actual = procrustes(reference_matrix, input_matrix)
+
+    # Calculate m^2 for each random trial
+    m_squared_trials = []
+    count_better = 0
+    for i in range(trials):
+        # Perform the procrustes analysis random trial
+        # with rows in the given reference matrix shuffled for each
+        # random trial (Justin Kuczynski this type of shuffling is appropriate
+        # for procrustes monte carlo)
+        m_squared_trial = procrustes(reference_matrix, input_matrix,
+                                     randomize_fn=np.random.shuffle)
+        m_squared_trials.append(m_squared_trial)
+
+        if m_squared_trial <= m_squared_actual:
+            count_better += 1
+
+    return m_squared_actual, m_squared_trials, count_better
+
+
+def procrustes(reference_matrix, input_matrix, randomize_fn=None):
     if (not isinstance(reference_matrix, OrdinationResults) or
             not isinstance(input_matrix, OrdinationResults)):
         raise ValueError('Expecting input and reference matrix to be'
@@ -44,6 +70,16 @@ def procrustes(reference_matrix, input_matrix):
     in_matrix = _reorder_rows(in_matrix, in_sample_ids, order)
     ref_matrix = _reorder_rows(ref_matrix, ref_sample_ids, order)
 
+    # If randomization function given, use it to shuffle the reference matrix
+    # (used for monte carlo random trial)
+    if randomize_fn:
+        return_matrix = randomize_fn(ref_matrix)
+
+        # if randomize_fn did not shuffle in-place, then update ref_matrix
+        # with the shuffled return_matrix manually
+        if return_matrix is not None:
+            ref_matrix = return_matrix
+
     # Apply padding to matrices to ensure equal dimensionality
     in_matrix, ref_matrix = _pad_matrices(in_matrix, ref_matrix)
 
@@ -51,6 +87,17 @@ def procrustes(reference_matrix, input_matrix):
     in_matrix_transformed, ref_matrix_transformed, m_squared = \
         scipy_procrustes(ref_matrix, in_matrix)
     return m_squared
+
+
+def calc_p_value(trials, count_better):
+    """
+    Calculate p-value and truncate to appropriate number of significant digits
+    (significant digits scaled logarithmically to number of trials).
+
+    """
+    pval = float(count_better) / float(trials)
+    decimal_places = int(np.log10(trials + 1))
+    return float(('%1.' + '%df' % decimal_places) % pval)
 
 
 def _reorder_rows(matrix, sample_ids, order):
