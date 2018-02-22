@@ -7,13 +7,13 @@ from mdsa.kruskal_stress import KruskalStress
 
 
 @click.command()
-@click.argument('input',
+@click.argument('distance_matrix_path',
                 type=click.Path(exists=True, dir_okay=False, readable=True))
-@click.option('--reference',
+@click.option('--ordination_results_path',
               type=click.Path(exists=True, dir_okay=False, readable=True),
               help='Reference OrdinationResults to compare against')
 @click.option('--outpath', type=click.Path(dir_okay=False, writable=True))
-def main(input, reference, outpath):
+def main(distance_matrix_path, ordination_results_path, outpath):
     """
     Arguments:
     input: path to serialized DistanceMatrix file
@@ -21,12 +21,14 @@ def main(input, reference, outpath):
     """
 
     click.echo('Calculating kruskal stress, comparing {} to {}'.format(
-        input, reference
+        distance_matrix_path, ordination_results_path
     ))
-    inp = DistanceMatrix.read(input).data
-    ref = OrdinationResults.read(reference).samples.as_matrix()
+    distance_matrix = DistanceMatrix.read(distance_matrix_path).data
+    ordination_results = OrdinationResults.read(
+        ordination_results_path).samples.as_matrix()
 
-    kruskal_stress = KruskalStress(ref, inp).calc_kruskal_stress()
+    kruskal_stress = KruskalStress(distance_matrix,
+                                   ordination_results).calc_kruskal_stress()
 
     click.echo('Outputting kruskal results to {}'.format(outpath))
     # Write kruskal stress output to file
