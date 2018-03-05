@@ -28,7 +28,8 @@ class Eigsh(Algorithm):
             eigenvalues, eigenvectors = eigsh(distance_matrix,
                                               k=num_dimensions_out,
                                               return_eigenvectors=True,
-                                              sigma=0,
+                                              sigma=1,
+                                              maxiter=5000,
                                               which='LM')
         except ArpackNoConvergence as e:
             warn('eigsh unable to converge, only returning {} currently '
@@ -59,15 +60,18 @@ class Eigsh(Algorithm):
         eigenvalues = np.array(eigenvalues)
         eigenvectors = np.array(eigenvectors)
 
-        # impute missing eigenvectors, composed of NaN entries
-        nan_eigenvecs = np.array([[np.nan] * eigenvectors.shape[1]] *
-                                 (expected_num_results -
-                                  len(eigenvectors)))
-        eigenvectors = np.concatenate((eigenvectors, nan_eigenvecs),
-                                      axis=0)
+        if len(eigenvectors) != expected_num_results:
+            # impute missing eigenvectors, composed of NaN entries
+            nan_eigenvecs = np.array([[np.nan] * eigenvectors.shape[1]] *
+                                     (expected_num_results -
+                                      len(eigenvectors)))
+            eigenvectors = np.concatenate((eigenvectors, nan_eigenvecs),
+                                          axis=0)
 
-        # impute missing eigenvalues as NaNs
-        nan_eigenvals = [[np.nan] * (expected_num_results -
-                                     len(eigenvalues))]
-        eigenvalues = np.append(eigenvalues, nan_eigenvals)
+        if len(eigenvalues) != expected_num_results:
+            # impute missing eigenvalues as NaNs
+            nan_eigenvals = [[np.nan] * (expected_num_results -
+                                         len(eigenvalues))]
+            eigenvalues = np.append(eigenvalues, nan_eigenvals)
+
         return eigenvectors, eigenvalues
