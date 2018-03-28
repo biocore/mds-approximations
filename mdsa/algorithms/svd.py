@@ -12,7 +12,7 @@ class SVD(Algorithm):
     def __init__(self):
         super(SVD, self).__init__(algorithm_name='svd')
 
-    def run(self, distance_matrix, num_dimensions_out=None):
+    def run(self, distance_matrix, num_dimensions_out=10):
         super(SVD, self).run(distance_matrix, num_dimensions_out)
 
         U, s, Vt = scipy.linalg.svd(distance_matrix, full_matrices=True)

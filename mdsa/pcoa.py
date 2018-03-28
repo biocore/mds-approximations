@@ -13,7 +13,7 @@ from skbio.stats.distance import DistanceMatrix
 #   http://math.stackexchange.com/a/47807/109129 for details) and in
 #   that case dropping the imaginary part means they'd no longer be
 #   so, so I'm not doing that.
-from centering import center_distance_matrix
+from .centering import center_distance_matrix
 from mdsa.algorithm import Algorithm
 
 

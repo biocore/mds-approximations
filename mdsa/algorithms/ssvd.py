@@ -68,7 +68,7 @@ class SSVD(Algorithm):
         b = dot(Q.transpose(), distance_matrix)
 
         # often, no iteration required to small error in eqn. 1.5
-        for i in xrange(1, qiter):
+        for i in range(1, qiter):
             y = dot(distance_matrix, b.transpose())
             Q, R = qr(y)
             b = dot(Q.transpose(), distance_matrix)

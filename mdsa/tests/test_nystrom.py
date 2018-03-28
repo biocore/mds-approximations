@@ -40,7 +40,7 @@ class TestNystrom(unittest.TestCase):
             self.test_matrix.shape[0], seedmat_dim,
             lambda x, y: (self.test_matrix[x, y]))
         self.assertTrue(len(order) == self.test_matrix.shape[0])
-        self.assertTrue(sorted(order) == range(self.test_matrix.shape[0]))
+        self.assertTrue(sorted(order) == list(range(self.test_matrix.shape[0])))
         self.assertTrue(seedmat.shape == (
             seedmat_dim, self.test_matrix.shape[0]))
 
@@ -98,18 +98,18 @@ class TestNystrom(unittest.TestCase):
         stress = kruskal_stress.KruskalStress(self.test_matrix, mds_coords)
         kruskal_stress_big_mat = stress.calc_kruskal_stress()
         if PRINT_STRESS:
-            print("INFO: Kruskal stress for Nystrom MDS "
+            print(("INFO: Kruskal stress for Nystrom MDS "
                   "(big_seed_matrix, dim=%d) = %f" %
-                  (dim, kruskal_stress_big_mat))
+                  (dim, kruskal_stress_big_mat)))
         self.assertTrue(kruskal_stress_big_mat < 0.04)
 
         mds_coords = self.nystrom._nystrom(self.small_seed_matrix, dim)
         stress = kruskal_stress.KruskalStress(self.test_matrix, mds_coords)
         kruskal_stress_small_mat = stress.calc_kruskal_stress()
         if PRINT_STRESS:
-            print("INFO: Kruskal stress for Nystrom MDS "
+            print(("INFO: Kruskal stress for Nystrom MDS "
                   "(small_seed_matrix, dim=%d) = %f" %
-                  (dim, kruskal_stress_small_mat))
+                  (dim, kruskal_stress_small_mat)))
         self.assertTrue(kruskal_stress_small_mat < 0.06)
 
         self.assertTrue(kruskal_stress_small_mat > kruskal_stress_big_mat)

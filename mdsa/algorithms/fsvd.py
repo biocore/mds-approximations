@@ -71,7 +71,7 @@ class FSVD(Algorithm):
             # use only the given exponent
             H = dot(distance_matrix, G)
 
-            for x in xrange(2, num_levels + 2):
+            for x in range(2, num_levels + 2):
                 # enhance decay of singular values
                 # note: distance_matrix is no longer transposed, saves work
                 # since we're expecting symmetric, square matrices anyway
@@ -86,7 +86,7 @@ class FSVD(Algorithm):
             # to enhance performance
             H = hstack(
                 (H, dot(distance_matrix, dot(distance_matrix, H))))
-            for x in xrange(3, num_levels + 2):
+            for x in range(3, num_levels + 2):
                 # Removed this transpose: dot(distance_matrix.transpose(), H)
                 tmp = dot(distance_matrix, dot(distance_matrix, H))
 

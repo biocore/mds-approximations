@@ -130,15 +130,15 @@ class Nystrom(Algorithm):
         t0 = time.clock()
         matrix_a = self._calc_matrix_a(matrix_e)
         if PRINT_TIMINGS:
-            print("TIMING(%s): Computation of A took %f CPU secs" %
-                  (__name__, time.clock() - t0))
+            print(("TIMING(%s): Computation of A took %f CPU secs" %
+                  (__name__, time.clock() - t0)))
 
         # matrix B
         t0 = time.clock()
         matrix_b = self._calc_matrix_b(matrix_e, matrix_f)
         if PRINT_TIMINGS:
-            print("TIMING(%s): Computation of B took %f CPU secs" %
-                  (__name__, time.clock() - t0))
+            print(("TIMING(%s): Computation of B took %f CPU secs" %
+                  (__name__, time.clock() - t0)))
 
         # print("INFO: Eigendecomposing A")
         t0 = time.clock()
@@ -152,8 +152,8 @@ class Nystrom(Algorithm):
         # alternative is svd: [U, S, V] = numpy.linalg.svd(matrix_a)
         (eigval_a, eigvec_a) = eigh(matrix_a)
         if PRINT_TIMINGS:
-            print("TIMING(%s): Eigendecomposition of A took %f CPU secs" %
-                  (__name__, time.clock() - t0))
+            print(("TIMING(%s): Eigendecomposition of A took %f CPU secs" %
+                  (__name__, time.clock() - t0)))
 
         # note: for optimization, if nystrom wins out, this is an excellent
         # cython or numba target
@@ -169,8 +169,8 @@ class Nystrom(Algorithm):
         # is to set negative values to zero. Fabian recommends using
         # absolute values (as in SVD)
         sqrt_eigval_a = sqrt(abs(eigval_a))
-        for i in xrange(nfull):
-            for j in xrange(dimensions):
+        for i in range(nfull):
+            for j in range(dimensions):
                 if i + 1 <= nseeds:
                     val = sqrt_eigval_a[j] * eigvec_a[i, j]
                 else:
@@ -201,8 +201,8 @@ class Nystrom(Algorithm):
                 result[i, j] = val
 
         if PRINT_TIMINGS:
-            print("TIMING(%s): Actual MDS approximation took %f CPU secs" %
-                  (__name__, time.clock() - t0))
+            print(("TIMING(%s): Actual MDS approximation took %f CPU secs" %
+                  (__name__, time.clock() - t0)))
 
         return result
 
@@ -295,16 +295,16 @@ class Nystrom(Algorithm):
             raise ValueError("distance getter function not callable")
 
         if permute_order:
-            picked_seeds = random.sample(range(fullmat_dim), seedmat_dim)
+            picked_seeds = random.sample(list(range(fullmat_dim)), seedmat_dim)
         else:
-            picked_seeds = range(seedmat_dim)
+            picked_seeds = list(range(seedmat_dim))
         # assert len(picked_seeds) == seedmat_dim, (
         #    "mismatch between number of picked seeds and seedmat dim.")
 
         # Putting picked seeds/indices at the front is not enough,
         # need to change/correct all indices to maintain consistency
         #
-        used_index_order = range(fullmat_dim)
+        used_index_order = list(range(fullmat_dim))
         picked_seeds.sort()  # otherwise the below fails
         for i, seed_idx in enumerate(picked_seeds):
             used_index_order.pop(seed_idx - i)
@@ -328,8 +328,8 @@ class Nystrom(Algorithm):
 
         restore_idxs = argsort(used_index_order)
         if PRINT_TIMINGS:
-            print("TIMING(%s): Seedmat calculation took %f CPU secs" %
-                  (__name__, time.clock() - t0))
+            print(("TIMING(%s): Seedmat calculation took %f CPU secs" %
+                  (__name__, time.clock() - t0)))
 
         # Return the seedmatrix and the list of indices which can be used to
         # recreate original order

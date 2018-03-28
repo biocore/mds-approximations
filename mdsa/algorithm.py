@@ -41,7 +41,6 @@ class Algorithm(object):
                              ' values have been prepared for PCoA '
                              '(centered, etc.). '
                              'Did you try to pass scikit-bio DistanceMatrix?')
-
         if distance_matrix.shape[0] <= num_dimensions_out:
             raise ValueError(
                 'Cannot run PCoA on distance_matrix with shape %s and '
