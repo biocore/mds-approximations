@@ -3,7 +3,7 @@
 sudo: false
 language: python
 env:
-  - PYTHON_VERSION=2.7
+  - PYTHON_VERSION=3
 before_install:
   - wget http://repo.continuum.io/miniconda/Miniconda3-3.7.3-Linux-x86_64.sh -O miniconda.sh
   - chmod +x miniconda.sh
@@ -12,9 +12,10 @@ before_install:
   # Update conda itself
   - conda update --yes conda
 install:
-  - conda create --yes --name mdsa python=$PYTHON_VERSION IPython 'matplotlib >= 1.4.3' 'numpy >= 1.9.2' 'pandas >= 0.16.2' 'scipy >= 0.15.1' 'scikit-bio>=0.4.0' 'scikit-learn' click cython nose pep8 flake8 pip
-  - if [ ${USE_CYTHON} ]; then conda install --yes -n mdsa cython; fi
-  - source activate mdsa
+  - conda env create -n mds-approximations -f environment.yml
+  - conda install --yes cython nose pep8 flake8 pip
+  #- if [ ${USE_CYTHON} ]; then conda install --yes -n mds-approximations cython; fi
+  - source activate mds-approximations
   - pip install .
   - pip install coveralls
 script:

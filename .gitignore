@@ -52,3 +52,5 @@ pip-log.txt
 
 # Generated PCoA output of algorithms
 out/*
+
+.env

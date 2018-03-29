@@ -11,7 +11,7 @@ class Eigh(Algorithm):
     def __init__(self):
         super(Eigh, self).__init__(algorithm_name='eigh')
 
-    def run(self, distance_matrix, num_dimensions_out=None):
+    def run(self, distance_matrix, num_dimensions_out=10):
         super(Eigh, self).run(distance_matrix, num_dimensions_out)
 
         eigenvalues, eigenvectors = eigh(distance_matrix)

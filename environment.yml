@@ -1,0 +1,17 @@
+name: mds-approximations
+channels:
+- qiime2
+- conda-forge
+- defaults
+- bioconda
+- biocore
+dependencies:
+- scikit-bio=0.4.2
+- click=6.7
+- python=3
+- numpy
+- scikit-learn=0.19.1
+- scipy
+- pandas
+- jupyter
+- matplotlib
