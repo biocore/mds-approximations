@@ -44,16 +44,6 @@ setup(name='mdsa',
       url='http://github.com/biocore/mds-approximations/',
       test_suite='nose.collector',
       packages=find_packages(),
-      install_requires=[
-          'IPython',
-          'matplotlib >= 1.5.1',
-          'numpy >= 1.10.4',
-          'pandas >= 0.18.1',
-          'scipy >= 0.17.1',
-          'scikit-bio==0.4.2',
-          'scikit-learn >= 0.17.1',
-          'click'
-      ],
       scripts=['scripts/mdsa', 'scripts/kruskal', 'scripts/procrustes'],
       extras_require={'test': ["nose", "pep8", "flake8"]},
       classifiers=classifiers)
