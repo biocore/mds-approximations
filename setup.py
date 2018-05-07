@@ -44,6 +44,7 @@ setup(name='mdsa',
       url='http://github.com/biocore/mds-approximations/',
       test_suite='nose.collector',
       packages=find_packages(),
-      scripts=['scripts/mdsa', 'scripts/kruskal', 'scripts/procrustes'],
+      scripts=['scripts/mdsa', 'scripts/kruskal', 'scripts/procrustes',
+               'scripts/randdm'],
       extras_require={'test': ["nose", "pep8", "flake8"]},
       classifiers=classifiers)
