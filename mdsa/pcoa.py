@@ -64,7 +64,7 @@ def pcoa(distance_matrix, algorithm, num_dimensions_out=10):
        If the distance is not euclidean (for example if it is a
        semimetric and the triangle inequality doesn't hold),
        negative eigenvalues can appear. There are different ways
-       to deal with that problem (see Legendre & Legendre 1998, \S
+       to deal with that problem (see Legendre & Legendre 1998, \\S
        9.2.3), but none are currently implemented here.
        However, a warning is raised whenever negative eigenvalues
        appear, allowing the user to decide if they can be safely
@@ -89,10 +89,6 @@ def pcoa(distance_matrix, algorithm, num_dimensions_out=10):
     # Coerce to numpy array just in case
     eigenvectors = np.array(eigenvectors)
     eigenvalues = np.array(eigenvalues)
-
-    # Ensure eigenvectors are normalized
-    eigenvectors = np.apply_along_axis(lambda vec: vec / np.linalg.norm(vec),
-                                       axis=1, arr=eigenvectors)
 
     # Generate axis labels for output
     axis_labels = ['PC%d' % i for i in range(1, len(eigenvectors) + 1)]
@@ -170,6 +166,13 @@ def pcoa(distance_matrix, algorithm, num_dimensions_out=10):
         # operation.
         eigenvectors = eigenvectors * np.sqrt(eigenvalues)
 
+        # Calculate the array of proportion of variance explained
+        # proportion_explained = eigenvalues / eigenvalues.sum()
+        sum_eigenvalues = np.trace(centered_dm)
+
+        # Calculate the array of proportion of variance explained
+        proportion_explained = eigenvalues / sum_eigenvalues
+
         # Now remove the dimensions with the least information
         # Only select k (num_dimensions_out) first eigenvectors
         # and their corresponding eigenvalues from the sorted array
@@ -178,9 +181,7 @@ def pcoa(distance_matrix, algorithm, num_dimensions_out=10):
         if len(eigenvalues) > num_dimensions_out:
             eigenvectors = eigenvectors[:, :num_dimensions_out]
             eigenvalues = eigenvalues[:num_dimensions_out]
-
-        # Calculate the array of proportion of variance explained
-        proportion_explained = eigenvalues / eigenvalues.sum()
+            proportion_explained = proportion_explained[:num_dimensions_out]
 
         return OrdinationResults(
             short_method_name='PCoA',
