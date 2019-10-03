@@ -40,7 +40,7 @@ Assume a full distance matrix D for N objects:
 
         /  E  |  F \
     D = |-----|----|
-        \ F.t |  G /
+        \\ F.t |  G /
 
 
 The correspondong association matrix or centered inner-product
@@ -48,7 +48,7 @@ matrix K is:
 
         /  A  |  B \
     K = |-----|----|
-        \ B.t |  C /
+        \\ B.t |  C /
 
 where A and B are computed as follows
 

@@ -6,12 +6,12 @@ channels:
 - bioconda
 - biocore
 dependencies:
-- scikit-bio=0.4.2
-- click=6.7
-- python=3
+- scikit-bio
+- click
 - numpy
-- scikit-learn=0.19.1
+- scikit-learn
 - scipy
 - pandas
 - jupyter
 - matplotlib
+- python=3.7

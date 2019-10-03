@@ -220,8 +220,8 @@ class CombineMds(object):
 
         Affine mapping function:
         Y = UX + kron(b,ones(1,n)), UU' = I
-        X = [x_1, x_2, ... , x_n]; x_j \in R^m
-        Y = [y_1, y_2, ... , y_n]; y_j \in R^m
+        X = [x_1, x_2, ... , x_n]; x_j \\in R^m
+        Y = [y_1, y_2, ... , y_n]; y_j \\in R^m
 
         From Tzeng 2008:
         `The projection of xi,2 from q2 dimension to q1 dimension

@@ -1,0 +1,164 @@
+#!/usr/bin/env python
+
+import os
+
+import click
+import numpy as np
+from skbio import DistanceMatrix
+from skbio.stats.distance import randdm
+from bayesian_regression.util.generators import band_table, block_table
+from skbio.diversity import beta_diversity
+
+
+@click.command()
+@click.option('--structure', 'structure', type=str,
+              help='Optional. Generate structure in the random data that '
+                   'models distributions of microbial communities. '
+                   'Options: "band" or "block". If not specified, then '
+                   'draws from gaussian distribution to generate distance '
+                   'matrices.', default=None)
+@click.option('--structure-distance-metric', 'distance_metric', type=str,
+              help='Distance metric to use when generating distance matrix'
+                   ' using the --structure flag. "braycurtis" by default',
+              default='braycurtis')
+@click.option('--dim', 'dimensions', type=int, multiple=True,
+              help='Dimension of the input matrix/matrices to generate')
+@click.option('--seed', 'seed', type=int,
+              help='Random number generator seed value.')
+@click.option('--sub', 'subsample_dims', type=str, multiple=True,
+              help='Generate subsampled distance matrix with given'
+                   'dimension (must be smaller than original dimension)'
+                   ' for each randomly generated distance matrix.'
+                   ' Can specify as int or percentage')
+@click.option('--overwrite', 'overwrite', type=bool, default=False,
+              help='Overwrite output directory if it already exists. Do not '
+                   'overwrite, by default.')
+@click.argument('output_dir', type=click.Path(), default=None)
+def generate(dimensions, output_dir, seed, distance_metric, subsample_dims,
+             structure, overwrite):
+    """
+    Generate random distance matrix. By default, generates a random distance
+    matrix drawing from a gaussian probability distribution. Since realistic
+    microbiome OTU tables and distance matrices typically do not follow such
+    a probability distribution, as they often contain "structure", i.e.
+    discrete block-like patterns or patterns along a gradient, another
+    option is provided to generate more realistic microbiome data that mimics
+    block or band-like structure, e.g. block-like could represent one grou of
+    microbes associated with a diseased state and another set associated with a
+    healthy state.
+
+    Parameters
+    ----------
+    dimensions : number
+        Dimension of the input matrix/matrices to generate.
+    output_dir : str
+        Path to the directory to output results to.
+    seed : number
+        Random seed for generating distance matrices. Optional.
+    distance_metric : str
+        Distance metric to use when generating distance matrix
+        using the --structure flag. "braycurtis" by default.
+        See skbio.diversity.beta_diversity for all accepted parameters.
+    subsample_dims : list of str
+        Generate subsampled distance matrix with given dimension
+        (must be smaller than original dimension) for each randomly
+        generated distance matrix. Can specify as int denoting specific
+        dimension or as percentage of, for example '25%', denoting percentage
+        of each main dimension specified in the 'dimensions' parameter.
+    structure : bool
+        Optional. Generate structure in the random data that
+        models distributions of microbial communities.
+        Options: "band" or "block". If not specified, then
+        draws from gaussian distribution to generate distance
+        matrices.
+    overwrite : bool
+        False by default. If True, overwrites output_dir if it already exists.
+
+    """
+
+    if seed is not None:
+        np.random.seed(seed)
+
+    if (not overwrite and os.path.exists(output_dir) and not click.confirm(
+            'The output directory %s exists. '
+            'Do you want to overwrite?' % output_dir)):
+        click.echo('Aborting.')
+        return
+
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    for dim in dimensions:
+        outpath = os.path.join(output_dir, 'randdm-{}.txt'.format(dim))
+
+        click.echo('Generating random distance matrix: %s' % outpath)
+
+        # Generate random distance matrix
+        if structure is not None:
+            click.echo('Generating synthetic OTU table with "{}"-like '
+                       'microbial distribution...'.format(structure))
+            if structure == 'band':
+                biom_table = band_table(dim, dim, seed=seed)[0]
+            elif structure == 'block':
+                biom_table = block_table(dim, dim, seed=seed)[0]
+            else:
+                raise ValueError('Invalid value for --structure parameter.')
+
+            otu_table = biom_table.matrix_data.todense()
+
+            click.echo('Generating distance matrix from OTU table...')
+            distance_matrix = beta_diversity(distance_metric, otu_table,
+                                             validate=False)
+
+        else:
+            click.echo('Generating random distance matrix '
+                       '(gaussian distribution)')
+            distance_matrix = randdm(dim, constructor=DistanceMatrix)
+
+        # Serialize distance matrix
+        distance_matrix.write(outpath)
+
+        # Subsampling
+        for subsample_dim in subsample_dims:
+            # Parse parameter values into integers
+            try:
+                if '%' in subsample_dim:
+                    percent = float(subsample_dim[:-1]) / 100
+                    subsample_dim = int(percent * dim)
+                else:
+                    subsample_dim = int(subsample_dim)
+            except ValueError:
+                click.echo('Format for --sub parameter is incorrect. Please '
+                           're-run with --help for instructions on accepted '
+                           'formats for this parameter.')
+                return
+
+            if subsample_dim <= 0:
+                raise ValueError('Subsample dimension must be greater than 0')
+
+            if subsample_dim >= dim:
+                raise ValueError('Subsample dimension %d must be smaller than'
+                                 'original matrix dimension %d' % (
+                                     subsample_dim,
+                                     dim))
+            subsampled_outpath = os.path.join(output_dir,
+                                              'randdm-{}-sub-{}.txt'
+                                              .format(dim, subsample_dim))
+
+            click.echo(
+                'Subsampling original randomly generated distance matrix '
+                'with subsample dimension %d: %s' % (subsample_dim,
+                                                     subsampled_outpath))
+
+            ids = distance_matrix.ids
+            # Subsample without replacement
+            subsampled_ids = np.random.choice(ids, subsample_dim,
+                                              replace=False)
+            subsampled_matrix = distance_matrix.filter(subsampled_ids)
+            subsampled_matrix.write(subsampled_outpath)
+
+    click.echo('Done.')
+
+
+if __name__ == '__main__':
+    generate()

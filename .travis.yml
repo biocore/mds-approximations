@@ -3,19 +3,19 @@
 sudo: false
 language: python
 env:
-  - PYTHON_VERSION=3
+  - PYTHON_VERSION=3.6
 before_install:
-  - wget http://repo.continuum.io/miniconda/Miniconda3-3.7.3-Linux-x86_64.sh -O miniconda.sh
+  - wget http://repo.continuum.io/miniconda/Miniconda3-4.6.14-Linux-x86_64.sh -O miniconda.sh
   - chmod +x miniconda.sh
   - ./miniconda.sh -b
   - export PATH=/home/travis/miniconda3/bin:$PATH
   # Update conda itself
   - conda update --yes conda
 install:
-  - conda env create -n mds-approximations -f environment.yml
-  - conda install --yes cython nose pep8 flake8 pip
-  #- if [ ${USE_CYTHON} ]; then conda install --yes -n mds-approximations cython; fi
+  - conda env create -n mds-approximations -f environment.yml python=3.6
   - source activate mds-approximations
+  - conda install --yes cython nose pep8 flake8 pip
+  # - if [ ${USE_CYTHON} ]; then conda install --yes cython; fi
   - pip install .
   - pip install coveralls
 script:
